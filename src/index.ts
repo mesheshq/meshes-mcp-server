@@ -36,7 +36,7 @@ if (!ACCESS_KEY || !SECRET_KEY || !ORG_ID) {
       `    }\n` +
       `  }\n` +
       `}\n\n` +
-      `Find your credentials in the Meshes dashboard under Settings → Machine Keys.`,
+      `Find your credentials in the Meshes dashboard under Profile → API Keys.`,
   );
   process.exit(1);
 }
