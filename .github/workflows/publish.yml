@@ -13,23 +13,20 @@ on:
         type: string
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
     environment: production
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: ${{ github.event.release.tag_name || inputs.ref }}
-      - name: Use Node
+          # Use release tag when release event; else use input ref
+          ref: ${{ github.event.release.tag_name || inputs.ref || github.sha }}
+      - name: Use Node 20
         uses: actions/setup-node@v6
         with:
           node-version: 20
-          registry-url: https://registry.npmjs.org/
       - name: Install dependencies
         run: npm ci
       - name: Typecheck
@@ -38,5 +35,39 @@ jobs:
         run: npm run build
       - name: Test
         run: npm test
-      - name: Publish
+      - name: Upload dist + package metadata
+        uses: actions/upload-artifact@v6
+        with:
+          name: package-build
+          path: |
+            dist/**
+            package.json
+            README.md
+            LICENSE
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout (for repo context)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name || inputs.ref || github.sha }}
+      - name: Use Node 24 (OIDC publish)
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org/
+      - name: Download build artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: package-build
+      - name: Install dependencies
+        run: npm ci
+      - name: Publish (OIDC only)
         run: npm publish --access public
