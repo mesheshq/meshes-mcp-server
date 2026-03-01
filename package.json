@@ -1,5 +1,5 @@
 {
-  "name": "meshes-mcp-server",
+  "name": "@mesheshq/mcp-server",
   "version": "1.0.0",
   "description": "MCP server for the Meshes event routing platform — lets AI agents emit events, manage workspaces, connections, rules, and debug deliveries.",
   "type": "module",
