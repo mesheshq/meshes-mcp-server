@@ -96,13 +96,13 @@ Add to your Windsurf MCP configuration:
 
 ## Environment Variables
 
-| Variable            | Required | Description                                     |
-| ------------------- | -------- | ----------------------------------------------- |
-| `MESHES_ACCESS_KEY` | Yes      | Machine access key from dashboard               |
-| `MESHES_SECRET_KEY` | Yes      | Machine secret key from dashboard               |
-| `MESHES_ORG_ID`     | Yes\*    | Organization UUID                               |
-| `MESHES_ORGANIZATION_ID` | Yes\* | Alias for `MESHES_ORG_ID` (SDK-compatible name) |
-| `MESHES_API_URL`    | No       | API base URL (default: `https://api.meshes.io`) |
+| Variable                 | Required | Description                                     |
+| ------------------------ | -------- | ----------------------------------------------- |
+| `MESHES_ACCESS_KEY`      | Yes      | Machine access key from dashboard               |
+| `MESHES_SECRET_KEY`      | Yes      | Machine secret key from dashboard               |
+| `MESHES_ORG_ID`          | Yes\*    | Organization UUID                               |
+| `MESHES_ORGANIZATION_ID` | Yes\*    | Alias for `MESHES_ORG_ID` (SDK-compatible name) |
+| `MESHES_API_URL`         | No       | API base URL (default: `https://api.meshes.io`) |
 
 \* Set either `MESHES_ORG_ID` or `MESHES_ORGANIZATION_ID`.
 
