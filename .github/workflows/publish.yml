@@ -5,10 +5,17 @@ name: Publish
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to publish (tag like v1.2.3, sha, or branch). Leave blank to use the release tag when available."
+        required: true
+        type: string
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: production
     permissions:
       contents: read
       id-token: write
