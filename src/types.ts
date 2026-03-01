@@ -1,16 +1,16 @@
 export type IntegrationType =
-  | "activecampaign"
-  | "aweber"
-  | "hubspot"
-  | "intercom"
-  | "mailchimp"
-  | "mailerlite"
-  | "resend"
-  | "salesforce"
-  | "webhook"
-  | "zoom";
+  | 'activecampaign'
+  | 'aweber'
+  | 'hubspot'
+  | 'intercom'
+  | 'mailchimp'
+  | 'mailerlite'
+  | 'resend'
+  | 'salesforce'
+  | 'webhook'
+  | 'zoom';
 
-export type EventStatus = "pending" | "processing" | "completed" | "failed";
+export type EventStatus = 'pending' | 'processing' | 'completed' | 'failed';
 
 export interface PaginatedResponse<T> {
   count: number;
@@ -71,7 +71,7 @@ export interface Rule {
 
 export interface RuleEvent {
   id: string;
-  type: "rule";
+  type: 'rule';
   workspace: string;
   event: string;
   event_id: string;
@@ -91,7 +91,7 @@ export interface RuleEvent {
 
 export interface MeshesEvent {
   id: string;
-  type?: "event";
+  type?: 'event';
   workspace: string;
   event: string;
   resource?: string;

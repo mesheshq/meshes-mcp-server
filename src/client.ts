@@ -14,7 +14,7 @@ import type {
   RuleEvent,
   RuleMetadata,
   Workspace,
-} from "./types.js";
+} from './types.js';
 
 // ── JWT Token Generation ──────────────────────────────────────
 // Meshes uses short-lived HS256 JWTs for machine-to-machine auth.
@@ -22,16 +22,16 @@ import type {
 
 async function mintJwt(config: MeshesConfig): Promise<string> {
   // Dynamic import — jose is an ESM package
-  const { SignJWT } = await import("jose");
+  const { SignJWT } = await import('jose');
 
   const key = new TextEncoder().encode(config.secretKey);
 
   const token = await new SignJWT({ org: config.orgId })
-    .setProtectedHeader({ alg: "HS256", typ: "JWT", kid: config.accessKey })
+    .setProtectedHeader({ alg: 'HS256', typ: 'JWT', kid: config.accessKey })
     .setIssuer(`urn:meshes:m2m:${config.accessKey}`)
-    .setAudience("meshes-api")
+    .setAudience('meshes-api')
     .setIssuedAt()
-    .setExpirationTime("30s")
+    .setExpirationTime('30s')
     .sign(key);
 
   return token;
@@ -56,7 +56,7 @@ export class MeshesApiClient {
       ...options,
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         ...options.headers,
       },
     });
@@ -73,7 +73,7 @@ export class MeshesApiClient {
   // ── Workspaces ────────────────────────────────────────────
 
   listWorkspaces(): Promise<PaginatedResponse<Workspace>> {
-    return this.request("/api/v1/workspaces");
+    return this.request('/api/v1/workspaces');
   }
 
   getWorkspace(id: string): Promise<Workspace> {
@@ -84,8 +84,8 @@ export class MeshesApiClient {
     name: string;
     description?: string;
   }): Promise<{ workspace: Workspace }> {
-    return this.request("/api/v1/workspaces", {
-      method: "POST",
+    return this.request('/api/v1/workspaces', {
+      method: 'POST',
       body: JSON.stringify(params),
     });
   }
@@ -95,7 +95,7 @@ export class MeshesApiClient {
     params: { name: string; description?: string | null },
   ): Promise<Workspace> {
     return this.request(`/api/v1/workspaces/${id}`, {
-      method: "PUT",
+      method: 'PUT',
       body: JSON.stringify(params),
     });
   }
@@ -120,20 +120,20 @@ export class MeshesApiClient {
     },
   ): Promise<PaginatedResponse<MeshesEvent>> {
     const query = new URLSearchParams();
-    if (params?.limit) query.set("limit", String(params.limit));
-    if (params?.cursor) query.set("cursor", params.cursor);
-    if (params?.event) query.set("event", params.event);
-    if (params?.status) query.set("status", params.status);
-    if (params?.resource) query.set("resource", params.resource);
-    if (params?.resource_id) query.set("resource_id", params.resource_id);
+    if (params?.limit) query.set('limit', String(params.limit));
+    if (params?.cursor) query.set('cursor', params.cursor);
+    if (params?.event) query.set('event', params.event);
+    if (params?.status) query.set('status', params.status);
+    if (params?.resource) query.set('resource', params.resource);
+    if (params?.resource_id) query.set('resource_id', params.resource_id);
     const qs = query.toString();
-    return this.request(`/api/v1/workspaces/${id}/events${qs ? `?${qs}` : ""}`);
+    return this.request(`/api/v1/workspaces/${id}/events${qs ? `?${qs}` : ''}`);
   }
 
   // ── Connections ───────────────────────────────────────────
 
   listConnections(): Promise<PaginatedResponse<Connection>> {
-    return this.request("/api/v1/connections");
+    return this.request('/api/v1/connections');
   }
 
   getConnection(id: string): Promise<Connection> {
@@ -147,8 +147,8 @@ export class MeshesApiClient {
     metadata: Record<string, unknown>;
     hidden?: boolean;
   }): Promise<{ connection: Connection }> {
-    return this.request("/api/v1/connections", {
-      method: "POST",
+    return this.request('/api/v1/connections', {
+      method: 'POST',
       body: JSON.stringify(params),
     });
   }
@@ -162,7 +162,7 @@ export class MeshesApiClient {
     },
   ): Promise<Connection> {
     return this.request(`/api/v1/connections/${id}`, {
-      method: "PUT",
+      method: 'PUT',
       body: JSON.stringify(params),
     });
   }
@@ -172,7 +172,7 @@ export class MeshesApiClient {
     forceDelete?: boolean,
   ): Promise<{ id: string; type: IntegrationType }> {
     return this.request(`/api/v1/connections/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       body: forceDelete ? JSON.stringify({ force_delete: true }) : undefined,
     });
   }
@@ -182,7 +182,7 @@ export class MeshesApiClient {
   }
 
   getConnectionFields(id: string, refresh?: boolean): Promise<unknown> {
-    const qs = refresh ? "?refresh=true" : "";
+    const qs = refresh ? '?refresh=true' : '';
     return this.request(`/api/v1/connections/${id}/fields${qs}`);
   }
 
@@ -198,11 +198,11 @@ export class MeshesApiClient {
     resource_id?: string;
   }): Promise<PaginatedResponse<Rule>> {
     const query = new URLSearchParams();
-    if (params?.event) query.set("event", params.event);
-    if (params?.resource) query.set("resource", params.resource);
-    if (params?.resource_id) query.set("resource_id", params.resource_id);
+    if (params?.event) query.set('event', params.event);
+    if (params?.resource) query.set('resource', params.resource);
+    if (params?.resource_id) query.set('resource_id', params.resource_id);
     const qs = query.toString();
-    return this.request(`/api/v1/rules${qs ? `?${qs}` : ""}`);
+    return this.request(`/api/v1/rules${qs ? `?${qs}` : ''}`);
   }
 
   getRule(id: string): Promise<Rule> {
@@ -219,8 +219,8 @@ export class MeshesApiClient {
     active?: boolean;
     hidden?: boolean;
   }): Promise<{ rule: Rule }> {
-    return this.request("/api/v1/rules", {
-      method: "POST",
+    return this.request('/api/v1/rules', {
+      method: 'POST',
       body: JSON.stringify(params),
     });
   }
@@ -231,7 +231,7 @@ export class MeshesApiClient {
     type: IntegrationType;
     event: string;
   }> {
-    return this.request(`/api/v1/rules/${id}`, { method: "DELETE" });
+    return this.request(`/api/v1/rules/${id}`, { method: 'DELETE' });
   }
 
   // ── Events ────────────────────────────────────────────────
@@ -241,10 +241,10 @@ export class MeshesApiClient {
     cursor?: string;
   }): Promise<PaginatedResponse<MeshesEvent>> {
     const query = new URLSearchParams();
-    if (params?.limit) query.set("limit", String(params.limit));
-    if (params?.cursor) query.set("cursor", params.cursor);
+    if (params?.limit) query.set('limit', String(params.limit));
+    if (params?.cursor) query.set('cursor', params.cursor);
     const qs = query.toString();
-    return this.request(`/api/v1/events${qs ? `?${qs}` : ""}`);
+    return this.request(`/api/v1/events${qs ? `?${qs}` : ''}`);
   }
 
   emitEvent(params: {
@@ -262,8 +262,8 @@ export class MeshesApiClient {
       created_at: string;
     };
   }> {
-    return this.request("/api/v1/events", {
-      method: "POST",
+    return this.request('/api/v1/events', {
+      method: 'POST',
       body: JSON.stringify(params),
     });
   }
@@ -277,8 +277,8 @@ export class MeshesApiClient {
       resource_id?: string;
     }>,
   ): Promise<{ count: number; error_count?: number; records: unknown[] }> {
-    return this.request("/api/v1/events/bulk", {
-      method: "POST",
+    return this.request('/api/v1/events/bulk', {
+      method: 'POST',
       body: JSON.stringify(events),
     });
   }
@@ -293,13 +293,13 @@ export class MeshesApiClient {
 
   retryEventRule(eventId: string, ruleId: string): Promise<RuleEvent> {
     return this.request(`/api/v1/events/${eventId}/rules/${ruleId}/retry`, {
-      method: "POST",
+      method: 'POST',
     });
   }
 
   // ── Integrations ──────────────────────────────────────────
 
   listIntegrations(): Promise<PaginatedResponse<unknown>> {
-    return this.request("/api/v1/integrations");
+    return this.request('/api/v1/integrations');
   }
 }

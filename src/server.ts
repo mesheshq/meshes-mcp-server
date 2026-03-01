@@ -1,15 +1,15 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { MeshesApiClient } from "./client.js";
-import { registerConnectionTools } from "./tools/connections.js";
-import { registerDeliveryTools } from "./tools/deliveries.js";
-import { registerEventTools } from "./tools/events.js";
-import { registerRuleTools } from "./tools/rules.js";
-import { registerWorkspaceTools } from "./tools/workspaces.js";
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { MeshesApiClient } from './client.js';
+import { registerConnectionTools } from './tools/connections.js';
+import { registerDeliveryTools } from './tools/deliveries.js';
+import { registerEventTools } from './tools/events.js';
+import { registerRuleTools } from './tools/rules.js';
+import { registerWorkspaceTools } from './tools/workspaces.js';
 
 export function createServer(client: MeshesApiClient): McpServer {
   const server = new McpServer({
-    name: "meshes-mcp-server",
-    version: "0.1.0",
+    name: 'meshes-mcp-server',
+    version: '0.1.0',
   });
 
   registerWorkspaceTools(server, client);

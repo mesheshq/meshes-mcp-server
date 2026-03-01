@@ -1,9 +1,9 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { MeshesApiClient } from "../../src/client.js";
-import { registerWorkspaceTools } from "../../src/tools/workspaces.js";
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MeshesApiClient } from '../../src/client.js';
+import { registerWorkspaceTools } from '../../src/tools/workspaces.js';
 
-vi.mock("../../src/client.js", async (importOriginal) => {
+vi.mock('../../src/client.js', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...(actual as any),
@@ -18,32 +18,32 @@ vi.mock("../../src/client.js", async (importOriginal) => {
   };
 });
 
-describe("workspace tools", () => {
+describe('workspace tools', () => {
   let server: McpServer;
   let client: any;
 
   beforeEach(() => {
     client = new MeshesApiClient({} as any);
-    server = new McpServer({ name: "test", version: "1.0.0" });
-    vi.spyOn(server, "registerTool");
+    server = new McpServer({ name: 'test', version: '1.0.0' });
+    vi.spyOn(server, 'registerTool');
 
     registerWorkspaceTools(server, client as any);
   });
 
-  it("registers all workspace tools", () => {
+  it('registers all workspace tools', () => {
     const tools = vi.mocked(server.registerTool).mock.calls.map((c) => c[0]);
-    expect(tools).toContain("meshes_list_workspaces");
-    expect(tools).toContain("meshes_get_workspace");
-    expect(tools).toContain("meshes_create_workspace");
-    expect(tools).toContain("meshes_update_workspace");
-    expect(tools).toContain("meshes_get_workspace_connections");
-    expect(tools).toContain("meshes_get_workspace_rules");
+    expect(tools).toContain('meshes_list_workspaces');
+    expect(tools).toContain('meshes_get_workspace');
+    expect(tools).toContain('meshes_create_workspace');
+    expect(tools).toContain('meshes_update_workspace');
+    expect(tools).toContain('meshes_get_workspace_connections');
+    expect(tools).toContain('meshes_get_workspace_rules');
   });
 
-  it("handlers should call listWorkspaces and return ok", async () => {
+  it('handlers should call listWorkspaces and return ok', async () => {
     const call = vi
       .mocked(server.registerTool)
-      .mock.calls.find((c) => c[0] === "meshes_list_workspaces");
+      .mock.calls.find((c) => c[0] === 'meshes_list_workspaces');
     const handler = call?.[2] as (args: any) => Promise<any>;
 
     client.listWorkspaces.mockResolvedValueOnce({ records: [] });
@@ -52,24 +52,24 @@ describe("workspace tools", () => {
 
     expect(client.listWorkspaces).toHaveBeenCalled();
     expect(result.isError).toBeUndefined();
-    expect(result.content[0].text).toContain("records");
+    expect(result.content[0].text).toContain('records');
   });
 
-  it("create handler passes properties", async () => {
+  it('create handler passes properties', async () => {
     const call = vi
       .mocked(server.registerTool)
-      .mock.calls.find((c) => c[0] === "meshes_create_workspace");
+      .mock.calls.find((c) => c[0] === 'meshes_create_workspace');
     const handler = call?.[2] as (args: any) => Promise<any>;
 
     client.createWorkspace.mockResolvedValueOnce({
-      workspace: { id: "ws_123" },
+      workspace: { id: 'ws_123' },
     });
 
-    await handler({ name: "Test", description: "desc" });
+    await handler({ name: 'Test', description: 'desc' });
 
     expect(client.createWorkspace).toHaveBeenCalledWith({
-      name: "Test",
-      description: "desc",
+      name: 'Test',
+      description: 'desc',
     });
   });
 });

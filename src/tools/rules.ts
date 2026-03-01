@@ -1,23 +1,23 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import type { MeshesApiClient } from "../client.js";
-import type { RuleMetadata } from "../types.js";
-import { toolError, toolOk } from "../utils.js";
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { z } from 'zod';
+import type { MeshesApiClient } from '../client.js';
+import type { RuleMetadata } from '../types.js';
+import { toolError, toolOk } from '../utils.js';
 
 export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
   server.registerTool(
-    "meshes_list_rules",
+    'meshes_list_rules',
     {
-      title: "List Rules",
+      title: 'List Rules',
       description:
-        "List all routing rules across the organization. Rules bind event types to connections with action metadata. Supports filtering by event, resource, and resource_id.",
+        'List all routing rules across the organization. Rules bind event types to connections with action metadata. Supports filtering by event, resource, and resource_id.',
       inputSchema: {
         event: z
           .string()
           .optional()
           .describe("Filter by event type (e.g., 'user.signup')"),
-        resource: z.string().optional().describe("Filter by resource type"),
-        resource_id: z.string().optional().describe("Filter by resource ID"),
+        resource: z.string().optional().describe('Filter by resource type'),
+        resource_id: z.string().optional().describe('Filter by resource ID'),
       },
       annotations: {
         readOnlyHint: true,
@@ -36,12 +36,12 @@ export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
   );
 
   server.registerTool(
-    "meshes_get_rule",
+    'meshes_get_rule',
     {
-      title: "Get Rule",
-      description: "Get details of a specific routing rule by UUID.",
+      title: 'Get Rule',
+      description: 'Get details of a specific routing rule by UUID.',
       inputSchema: {
-        rule_id: z.string().uuid().describe("The rule UUID"),
+        rule_id: z.string().uuid().describe('The rule UUID'),
       },
       annotations: {
         readOnlyHint: true,
@@ -60,17 +60,17 @@ export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
   );
 
   server.registerTool(
-    "meshes_create_rule",
+    'meshes_create_rule',
     {
-      title: "Create Rule",
+      title: 'Create Rule',
       description:
         "Create a routing rule that binds an event type to a connection. The metadata.action field is required and determines what the destination does (e.g., 'create_or_update_contact'). Use meshes_get_connection_actions to discover available actions.",
       inputSchema: {
-        workspace: z.string().uuid().describe("The workspace UUID"),
+        workspace: z.string().uuid().describe('The workspace UUID'),
         connection: z
           .string()
           .uuid()
-          .describe("The connection UUID this rule routes to"),
+          .describe('The connection UUID this rule routes to'),
         event: z
           .string()
           .min(1)
@@ -81,33 +81,33 @@ export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
           .string()
           .min(1)
           .describe(
-            "The action the destination performs (goes into metadata.action)",
+            'The action the destination performs (goes into metadata.action)',
           ),
         resource: z
           .string()
           .optional()
-          .describe("Optional resource type filter"),
+          .describe('Optional resource type filter'),
         resource_id: z
           .string()
           .optional()
           .describe(
-            "Optional resource ID filter (pattern: ^[A-Za-z0-9._:-]{1,64}$)",
+            'Optional resource ID filter (pattern: ^[A-Za-z0-9._:-]{1,64}$)',
           ),
         active: z
           .boolean()
           .default(true)
           .optional()
-          .describe("Whether the rule is active (default true)"),
+          .describe('Whether the rule is active (default true)'),
         hidden: z
           .boolean()
           .default(false)
           .optional()
-          .describe("Hide from UI (default false)"),
+          .describe('Hide from UI (default false)'),
         metadata_extra: z
           .record(z.string(), z.string())
           .optional()
           .describe(
-            "Additional metadata fields (id, name, value, key, data, option, option_value)",
+            'Additional metadata fields (id, name, value, key, data, option, option_value)',
           ),
       },
       annotations: {
@@ -149,13 +149,13 @@ export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
   );
 
   server.registerTool(
-    "meshes_delete_rule",
+    'meshes_delete_rule',
     {
-      title: "Delete Rule",
+      title: 'Delete Rule',
       description:
-        "Delete a routing rule. Events matching this rule will no longer be routed to its connection.",
+        'Delete a routing rule. Events matching this rule will no longer be routed to its connection.',
       inputSchema: {
-        rule_id: z.string().uuid().describe("The rule UUID"),
+        rule_id: z.string().uuid().describe('The rule UUID'),
       },
       annotations: {
         readOnlyHint: false,

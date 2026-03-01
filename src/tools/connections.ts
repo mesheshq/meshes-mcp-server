@@ -1,20 +1,20 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import type { MeshesApiClient } from "../client.js";
-import type { IntegrationType } from "../types.js";
-import { toolError, toolOk } from "../utils.js";
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { z } from 'zod';
+import type { MeshesApiClient } from '../client.js';
+import type { IntegrationType } from '../types.js';
+import { toolError, toolOk } from '../utils.js';
 
 const INTEGRATION_TYPES = [
-  "activecampaign",
-  "aweber",
-  "hubspot",
-  "intercom",
-  "mailchimp",
-  "mailerlite",
-  "resend",
-  "salesforce",
-  "webhook",
-  "zoom",
+  'activecampaign',
+  'aweber',
+  'hubspot',
+  'intercom',
+  'mailchimp',
+  'mailerlite',
+  'resend',
+  'salesforce',
+  'webhook',
+  'zoom',
 ] as const;
 
 export function registerConnectionTools(
@@ -22,11 +22,11 @@ export function registerConnectionTools(
   client: MeshesApiClient,
 ) {
   server.registerTool(
-    "meshes_list_connections",
+    'meshes_list_connections',
     {
-      title: "List Connections",
+      title: 'List Connections',
       description:
-        "List all connections across the organization. Connections are configured destinations (HubSpot, Salesforce, Resend, webhooks, etc.) holding credentials and config.",
+        'List all connections across the organization. Connections are configured destinations (HubSpot, Salesforce, Resend, webhooks, etc.) holding credentials and config.',
       inputSchema: {},
       annotations: {
         readOnlyHint: true,
@@ -45,13 +45,13 @@ export function registerConnectionTools(
   );
 
   server.registerTool(
-    "meshes_get_connection",
+    'meshes_get_connection',
     {
-      title: "Get Connection",
+      title: 'Get Connection',
       description:
-        "Get details of a specific connection. Does not expose raw credentials.",
+        'Get details of a specific connection. Does not expose raw credentials.',
       inputSchema: {
-        connection_id: z.string().uuid().describe("The connection UUID"),
+        connection_id: z.string().uuid().describe('The connection UUID'),
       },
       annotations: {
         readOnlyHint: true,
@@ -70,30 +70,30 @@ export function registerConnectionTools(
   );
 
   server.registerTool(
-    "meshes_create_connection",
+    'meshes_create_connection',
     {
-      title: "Create Connection",
+      title: 'Create Connection',
       description:
-        "Create a new connection (destination) in a workspace. The metadata object contains connector-specific configuration (API keys, OAuth tokens, webhook URLs, etc.).",
+        'Create a new connection (destination) in a workspace. The metadata object contains connector-specific configuration (API keys, OAuth tokens, webhook URLs, etc.).',
       inputSchema: {
         workspace: z
           .string()
           .uuid()
-          .describe("The workspace UUID this connection belongs to"),
-        type: z.enum(INTEGRATION_TYPES).describe("Integration type"),
+          .describe('The workspace UUID this connection belongs to'),
+        type: z.enum(INTEGRATION_TYPES).describe('Integration type'),
         name: z
           .string()
           .min(1)
           .max(128)
-          .describe("Connection name (alphanumeric/space/underscore/dash)"),
+          .describe('Connection name (alphanumeric/space/underscore/dash)'),
         metadata: z
           .record(z.string(), z.unknown())
-          .describe("Connector-specific configuration"),
+          .describe('Connector-specific configuration'),
         hidden: z
           .boolean()
           .default(false)
           .optional()
-          .describe("Hide from UI (default false)"),
+          .describe('Hide from UI (default false)'),
       },
       annotations: {
         readOnlyHint: false,
@@ -120,17 +120,17 @@ export function registerConnectionTools(
   );
 
   server.registerTool(
-    "meshes_update_connection",
+    'meshes_update_connection',
     {
-      title: "Update Connection",
+      title: 'Update Connection',
       description: "Update a connection's name, metadata, or visibility.",
       inputSchema: {
-        connection_id: z.string().uuid().describe("The connection UUID"),
-        name: z.string().min(1).max(128).describe("Updated name"),
+        connection_id: z.string().uuid().describe('The connection UUID'),
+        name: z.string().min(1).max(128).describe('Updated name'),
         metadata: z
           .record(z.string(), z.unknown())
-          .describe("Updated connector-specific configuration"),
-        hidden: z.boolean().optional().describe("Hide from UI"),
+          .describe('Updated connector-specific configuration'),
+        hidden: z.boolean().optional().describe('Hide from UI'),
       },
       annotations: {
         readOnlyHint: false,
@@ -155,18 +155,18 @@ export function registerConnectionTools(
   );
 
   server.registerTool(
-    "meshes_delete_connection",
+    'meshes_delete_connection',
     {
-      title: "Delete Connection",
+      title: 'Delete Connection',
       description:
-        "Delete a connection. Returns 409 if it has active rules unless force_delete is true.",
+        'Delete a connection. Returns 409 if it has active rules unless force_delete is true.',
       inputSchema: {
-        connection_id: z.string().uuid().describe("The connection UUID"),
+        connection_id: z.string().uuid().describe('The connection UUID'),
         force_delete: z
           .boolean()
           .default(false)
           .optional()
-          .describe("Force delete even if rules exist"),
+          .describe('Force delete even if rules exist'),
       },
       annotations: {
         readOnlyHint: false,
@@ -187,13 +187,13 @@ export function registerConnectionTools(
   );
 
   server.registerTool(
-    "meshes_get_connection_actions",
+    'meshes_get_connection_actions',
     {
-      title: "Get Connection Actions",
+      title: 'Get Connection Actions',
       description:
-        "Get available actions for a connection (e.g., create_or_update_contact, add_to_list). Use this to discover what actions to put in rule metadata.",
+        'Get available actions for a connection (e.g., create_or_update_contact, add_to_list). Use this to discover what actions to put in rule metadata.',
       inputSchema: {
-        connection_id: z.string().uuid().describe("The connection UUID"),
+        connection_id: z.string().uuid().describe('The connection UUID'),
       },
       annotations: {
         readOnlyHint: true,
@@ -212,18 +212,18 @@ export function registerConnectionTools(
   );
 
   server.registerTool(
-    "meshes_get_connection_fields",
+    'meshes_get_connection_fields',
     {
-      title: "Get Connection Fields",
+      title: 'Get Connection Fields',
       description:
-        "Get the destination field catalog for a connection. Returns field keys, types, constraints, and allowed values. Useful for building field mappings.",
+        'Get the destination field catalog for a connection. Returns field keys, types, constraints, and allowed values. Useful for building field mappings.',
       inputSchema: {
-        connection_id: z.string().uuid().describe("The connection UUID"),
+        connection_id: z.string().uuid().describe('The connection UUID'),
         refresh: z
           .boolean()
           .default(false)
           .optional()
-          .describe("Force refresh the field catalog from the provider"),
+          .describe('Force refresh the field catalog from the provider'),
       },
       annotations: {
         readOnlyHint: true,
@@ -242,13 +242,13 @@ export function registerConnectionTools(
   );
 
   server.registerTool(
-    "meshes_get_connection_default_mappings",
+    'meshes_get_connection_default_mappings',
     {
-      title: "Get Connection Default Mappings",
+      title: 'Get Connection Default Mappings',
       description:
-        "Get the default field mapping for a connection. Mappings define how event payload fields map to destination fields with optional transforms (trim, lower, upper, to_string, etc.).",
+        'Get the default field mapping for a connection. Mappings define how event payload fields map to destination fields with optional transforms (trim, lower, upper, to_string, etc.).',
       inputSchema: {
-        connection_id: z.string().uuid().describe("The connection UUID"),
+        connection_id: z.string().uuid().describe('The connection UUID'),
       },
       annotations: {
         readOnlyHint: true,
@@ -267,9 +267,9 @@ export function registerConnectionTools(
   );
 
   server.registerTool(
-    "meshes_list_integrations",
+    'meshes_list_integrations',
     {
-      title: "List Integrations",
+      title: 'List Integrations',
       description:
         "Get metadata about all supported integration types. Returns each type's authentication method (oauth, api_key, basic, none), available actions, and field definitions. Useful for discovering what integrations are possible and what actions they support.",
       inputSchema: {},

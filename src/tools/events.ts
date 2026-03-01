@@ -1,20 +1,20 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import type { MeshesApiClient } from "../client.js";
-import { toolError, toolOk } from "../utils.js";
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { z } from 'zod';
+import type { MeshesApiClient } from '../client.js';
+import { toolError, toolOk } from '../utils.js';
 
 export function registerEventTools(server: McpServer, client: MeshesApiClient) {
   server.registerTool(
-    "meshes_emit_event",
+    'meshes_emit_event',
     {
-      title: "Emit Event",
+      title: 'Emit Event',
       description:
         "Emit a product event to Meshes for routing and delivery. The event is matched against rules in the specified workspace and delivered to all matching connections. Always include 'email' in the payload for person-related events.",
       inputSchema: {
         workspace: z
           .string()
           .uuid()
-          .describe("The workspace UUID to emit the event into"),
+          .describe('The workspace UUID to emit the event into'),
         event: z
           .string()
           .min(1)
@@ -33,7 +33,7 @@ export function registerEventTools(server: McpServer, client: MeshesApiClient) {
         resource_id: z
           .string()
           .optional()
-          .describe("Optional resource ID for deduplication"),
+          .describe('Optional resource ID for deduplication'),
       },
       annotations: {
         readOnlyHint: false,
@@ -54,7 +54,7 @@ export function registerEventTools(server: McpServer, client: MeshesApiClient) {
         return {
           content: [
             {
-              type: "text" as const,
+              type: 'text' as const,
               text:
                 `Event emitted successfully. ID: ${result.event.id}\n` +
                 `Event "${event}" will be routed to all matching rules in workspace ${workspace}.\n\n` +
@@ -69,11 +69,11 @@ export function registerEventTools(server: McpServer, client: MeshesApiClient) {
   );
 
   server.registerTool(
-    "meshes_emit_bulk_events",
+    'meshes_emit_bulk_events',
     {
-      title: "Emit Bulk Events",
+      title: 'Emit Bulk Events',
       description:
-        "Emit up to 100 events in a single request. Returns 201 on full success, 207 on partial success with per-event error details.",
+        'Emit up to 100 events in a single request. Returns 201 on full success, 207 on partial success with per-event error details.',
       inputSchema: {
         events: z
           .array(
@@ -87,7 +87,7 @@ export function registerEventTools(server: McpServer, client: MeshesApiClient) {
           )
           .min(1)
           .max(100)
-          .describe("Array of 1-100 event objects"),
+          .describe('Array of 1-100 event objects'),
       },
       annotations: {
         readOnlyHint: false,

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { MeshesApiClient } from "./client.js";
-import { createServer } from "./server.js";
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { MeshesApiClient } from './client.js';
+import { createServer } from './server.js';
 
 // ── Configuration ─────────────────────────────────────────────
 // Authentication uses short-lived HS256 JWTs minted from your
@@ -12,16 +12,16 @@ import { createServer } from "./server.js";
 const ACCESS_KEY = process.env.MESHES_ACCESS_KEY;
 const SECRET_KEY = process.env.MESHES_SECRET_KEY;
 const ORG_ID = process.env.MESHES_ORG_ID;
-const BASE_URL = process.env.MESHES_API_URL || "https://api.meshes.io";
+const BASE_URL = process.env.MESHES_API_URL || 'https://api.meshes.io';
 
 if (!ACCESS_KEY || !SECRET_KEY || !ORG_ID) {
   const missing = [];
-  if (!ACCESS_KEY) missing.push("MESHES_ACCESS_KEY");
-  if (!SECRET_KEY) missing.push("MESHES_SECRET_KEY");
-  if (!ORG_ID) missing.push("MESHES_ORG_ID");
+  if (!ACCESS_KEY) missing.push('MESHES_ACCESS_KEY');
+  if (!SECRET_KEY) missing.push('MESHES_SECRET_KEY');
+  if (!ORG_ID) missing.push('MESHES_ORG_ID');
 
   console.error(
-    `Error: Missing required environment variable ${missing.join(", ")}\n` +
+    `Error: Missing required environment variable ${missing.join(', ')}\n` +
       `Set it in your MCP client configuration:\n\n` +
       `{\n` +
       `  "mcpServers": {\n` +
@@ -55,10 +55,10 @@ const server = createServer(client);
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Meshes MCP server running on stdio");
+  console.error('Meshes MCP server running on stdio');
 }
 
 main().catch((error) => {
-  console.error("Fatal error:", error);
+  console.error('Fatal error:', error);
   process.exit(1);
 });
