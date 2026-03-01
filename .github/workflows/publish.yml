@@ -17,13 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - name: Checkout main
+      - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
           # Use release tag when release event; else use input ref
           ref: ${{ github.event.release.tag_name || inputs.ref || github.sha }}
-      - name: Use Node
+      - name: Use Node 20
         uses: actions/setup-node@v6
         with:
           node-version: 20
