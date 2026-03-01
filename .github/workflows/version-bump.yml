@@ -1,0 +1,54 @@
+# This workflow will create a new release for the package
+
+name: Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "major | minor | patch"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  publish-new-version:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Use Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm test
+      - name: Create New Version
+        run: |
+          npm version ${{ github.event.inputs.release }} --no-git-tag-version
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v8
+        with:
+          commit-message: "v${{ env.VERSION }}"
+          title: "v${{ env.VERSION }}"
+          body: "Automated version bump for v${{ env.VERSION }}."
+          branch: "release/v${{ env.VERSION }}"
+          delete-branch: true
