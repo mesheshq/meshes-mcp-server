@@ -1,5 +1,9 @@
 # @mesheshq/mcp-server
 
+[![Tests](https://github.com/mesheshq/meshes-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/mesheshq/meshes-mcp-server/actions/workflows/ci.yml)
+[![NPM Version][npm-version-image]][npm-url]
+[![NPM Install Size][npm-install-size-image]][npm-install-size-url]
+
 MCP server for [Meshes](https://meshes.io) — emit events, manage workspaces,
 create routing rules, and inspect deliveries from any MCP-compatible client.
 
@@ -156,3 +160,8 @@ isolation built in.
 ## License
 
 MIT
+
+[npm-install-size-image]: https://badgen.net/packagephobia/publish/@mesheshq/mcp-server?cache=200
+[npm-install-size-url]: https://packagephobia.com/result?p=%40mesheshq%2Fmcp-server
+[npm-url]: https://www.npmjs.com/package/@mesheshq/mcp-server
+[npm-version-image]: https://badgen.net/npm/v/@mesheshq/mcp-server?cache=200
