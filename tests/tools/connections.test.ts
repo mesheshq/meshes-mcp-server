@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MeshesApiClient } from "../../src/client.js";
 import { registerConnectionTools } from "../../src/tools/connections.js";
 
@@ -29,6 +29,7 @@ describe("connection tools", () => {
     client = new MeshesApiClient({} as any);
     server = new McpServer({ name: "test", version: "1.0.0" });
     vi.spyOn(server, "registerTool");
+
     registerConnectionTools(server, client as any);
   });
 
@@ -45,7 +46,7 @@ describe("connection tools", () => {
     const call = vi
       .mocked(server.registerTool)
       .mock.calls.find((c) => c[0] === "meshes_create_connection");
-    const handler = call![2] as Function;
+    const handler = call?.[2] as (args: any) => Promise<any>;
 
     client.createConnection.mockResolvedValueOnce({
       connection: { id: "conn_123" },
@@ -72,7 +73,7 @@ describe("connection tools", () => {
     const call = vi
       .mocked(server.registerTool)
       .mock.calls.find((c) => c[0] === "meshes_delete_connection");
-    const handler = call![2] as Function;
+    const handler = call?.[2] as (args: any) => Promise<any>;
 
     client.deleteConnection.mockResolvedValueOnce({ id: "conn_123" });
 

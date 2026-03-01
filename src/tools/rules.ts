@@ -1,8 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { MeshesApiClient } from "../client.js";
-import { toolError, toolOk } from "../utils.js";
 import type { RuleMetadata } from "../types.js";
+import { toolError, toolOk } from "../utils.js";
 
 export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
   server.registerTool(
@@ -32,7 +32,7 @@ export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -56,7 +56,7 @@ export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -75,13 +75,13 @@ export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
           .string()
           .min(1)
           .describe(
-            "Event type to match (e.g., 'user.signup', 'payment.failed')"
+            "Event type to match (e.g., 'user.signup', 'payment.failed')",
           ),
         action: z
           .string()
           .min(1)
           .describe(
-            "The action the destination performs (goes into metadata.action)"
+            "The action the destination performs (goes into metadata.action)",
           ),
         resource: z
           .string()
@@ -91,7 +91,7 @@ export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
           .string()
           .optional()
           .describe(
-            "Optional resource ID filter (pattern: ^[A-Za-z0-9._:-]{1,64}$)"
+            "Optional resource ID filter (pattern: ^[A-Za-z0-9._:-]{1,64}$)",
           ),
         active: z
           .boolean()
@@ -107,7 +107,7 @@ export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
           .record(z.string(), z.string())
           .optional()
           .describe(
-            "Additional metadata fields (id, name, value, key, data, option, option_value)"
+            "Additional metadata fields (id, name, value, key, data, option, option_value)",
           ),
       },
       annotations: {
@@ -140,12 +140,12 @@ export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
             resource_id,
             active,
             hidden,
-          })
+          }),
         );
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -170,6 +170,6 @@ export function registerRuleTools(server: McpServer, client: MeshesApiClient) {
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 }

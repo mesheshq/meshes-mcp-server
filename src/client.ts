@@ -4,16 +4,16 @@
  */
 
 import type {
-  IntegrationType,
-  EventStatus,
-  PaginatedResponse,
-  Workspace,
   Connection,
-  RuleMetadata,
+  EventStatus,
+  IntegrationType,
+  MeshesConfig,
+  MeshesEvent,
+  PaginatedResponse,
   Rule,
   RuleEvent,
-  MeshesEvent,
-  MeshesConfig,
+  RuleMetadata,
+  Workspace,
 } from "./types.js";
 
 // ── JWT Token Generation ──────────────────────────────────────
@@ -48,7 +48,7 @@ export class MeshesApiClient {
 
   private async request<T>(
     path: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
   ): Promise<T> {
     const token = await mintJwt(this.config);
     const url = `${this.config.baseUrl}${path}`;
@@ -92,7 +92,7 @@ export class MeshesApiClient {
 
   updateWorkspace(
     id: string,
-    params: { name: string; description?: string | null }
+    params: { name: string; description?: string | null },
   ): Promise<Workspace> {
     return this.request(`/api/v1/workspaces/${id}`, {
       method: "PUT",
@@ -117,7 +117,7 @@ export class MeshesApiClient {
       status?: EventStatus;
       resource?: string;
       resource_id?: string;
-    }
+    },
   ): Promise<PaginatedResponse<MeshesEvent>> {
     const query = new URLSearchParams();
     if (params?.limit) query.set("limit", String(params.limit));
@@ -159,7 +159,7 @@ export class MeshesApiClient {
       name: string;
       metadata: Record<string, unknown>;
       hidden?: boolean;
-    }
+    },
   ): Promise<Connection> {
     return this.request(`/api/v1/connections/${id}`, {
       method: "PUT",
@@ -169,7 +169,7 @@ export class MeshesApiClient {
 
   deleteConnection(
     id: string,
-    forceDelete?: boolean
+    forceDelete?: boolean,
   ): Promise<{ id: string; type: IntegrationType }> {
     return this.request(`/api/v1/connections/${id}`, {
       method: "DELETE",
@@ -275,7 +275,7 @@ export class MeshesApiClient {
       payload: Record<string, unknown>;
       resource?: string;
       resource_id?: string;
-    }>
+    }>,
   ): Promise<{ count: number; error_count?: number; records: unknown[] }> {
     return this.request("/api/v1/events/bulk", {
       method: "POST",

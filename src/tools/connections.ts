@@ -1,8 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { MeshesApiClient } from "../client.js";
-import { toolError, toolOk } from "../utils.js";
 import type { IntegrationType } from "../types.js";
+import { toolError, toolOk } from "../utils.js";
 
 const INTEGRATION_TYPES = [
   "activecampaign",
@@ -19,7 +19,7 @@ const INTEGRATION_TYPES = [
 
 export function registerConnectionTools(
   server: McpServer,
-  client: MeshesApiClient
+  client: MeshesApiClient,
 ) {
   server.registerTool(
     "meshes_list_connections",
@@ -41,7 +41,7 @@ export function registerConnectionTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -66,7 +66,7 @@ export function registerConnectionTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -111,12 +111,12 @@ export function registerConnectionTools(
             name,
             metadata,
             hidden,
-          })
+          }),
         );
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -146,12 +146,12 @@ export function registerConnectionTools(
             name,
             metadata,
             hidden,
-          })
+          }),
         );
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -178,12 +178,12 @@ export function registerConnectionTools(
     async ({ connection_id, force_delete }) => {
       try {
         return toolOk(
-          await client.deleteConnection(connection_id, force_delete)
+          await client.deleteConnection(connection_id, force_delete),
         );
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -208,7 +208,7 @@ export function registerConnectionTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -238,7 +238,7 @@ export function registerConnectionTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -263,7 +263,7 @@ export function registerConnectionTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -286,6 +286,6 @@ export function registerConnectionTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 }

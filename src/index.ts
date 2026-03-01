@@ -15,7 +15,7 @@ const ORG_ID = process.env.MESHES_ORG_ID;
 const BASE_URL = process.env.MESHES_API_URL || "https://api.meshes.io";
 
 if (!ACCESS_KEY || !SECRET_KEY || !ORG_ID) {
-  let missing = [];
+  const missing = [];
   if (!ACCESS_KEY) missing.push("MESHES_ACCESS_KEY");
   if (!SECRET_KEY) missing.push("MESHES_SECRET_KEY");
   if (!ORG_ID) missing.push("MESHES_ORG_ID");
@@ -36,7 +36,7 @@ if (!ACCESS_KEY || !SECRET_KEY || !ORG_ID) {
       `    }\n` +
       `  }\n` +
       `}\n\n` +
-      `Find your credentials in the Meshes dashboard under Settings → Machine Keys.`
+      `Find your credentials in the Meshes dashboard under Settings → Machine Keys.`,
   );
   process.exit(1);
 }

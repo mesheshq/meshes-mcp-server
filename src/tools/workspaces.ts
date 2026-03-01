@@ -2,9 +2,8 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { MeshesApiClient } from "../client.js";
 import { toolError, toolOk } from "../utils.js";
-import type { EventStatus } from "../types.js";
 
-const EVENT_STATUSES = [
+const _EVENT_STATUSES = [
   "pending",
   "processing",
   "completed",
@@ -13,7 +12,7 @@ const EVENT_STATUSES = [
 
 export function registerWorkspaceTools(
   server: McpServer,
-  client: MeshesApiClient
+  client: MeshesApiClient,
 ) {
   server.registerTool(
     "meshes_list_workspaces",
@@ -35,7 +34,7 @@ export function registerWorkspaceTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -60,7 +59,7 @@ export function registerWorkspaceTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -75,7 +74,7 @@ export function registerWorkspaceTools(
           .min(3)
           .max(50)
           .describe(
-            "Workspace name (3-50 chars, alphanumeric/space/underscore/dash)"
+            "Workspace name (3-50 chars, alphanumeric/space/underscore/dash)",
           ),
         description: z
           .string()
@@ -96,7 +95,7 @@ export function registerWorkspaceTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -124,12 +123,12 @@ export function registerWorkspaceTools(
     async ({ workspace_id, name, description }) => {
       try {
         return toolOk(
-          await client.updateWorkspace(workspace_id, { name, description })
+          await client.updateWorkspace(workspace_id, { name, description }),
         );
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -153,7 +152,7 @@ export function registerWorkspaceTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -177,6 +176,6 @@ export function registerWorkspaceTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 }

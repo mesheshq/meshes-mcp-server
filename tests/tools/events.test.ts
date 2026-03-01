@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MeshesApiClient } from "../../src/client.js";
 import { registerEventTools } from "../../src/tools/events.js";
 
@@ -24,6 +24,7 @@ describe("emit-event tool", () => {
 
     // In SDK around version >= 1.0.0, we can spy on registerTool
     vi.spyOn(server, "registerTool");
+
     registerEventTools(server, client as any);
   });
 
@@ -37,7 +38,7 @@ describe("emit-event tool", () => {
     const emitEventCall = vi
       .mocked(server.registerTool)
       .mock.calls.find((c) => c[0] === "meshes_emit_event");
-    const handler = emitEventCall![2] as Function;
+    const handler = emitEventCall?.[2] as (args: any) => Promise<any>;
 
     client.emitEvent.mockResolvedValueOnce({
       event: { id: "evt_123" },
@@ -65,7 +66,7 @@ describe("emit-event tool", () => {
     const emitEventCall = vi
       .mocked(server.registerTool)
       .mock.calls.find((c) => c[0] === "meshes_emit_event");
-    const handler = emitEventCall![2] as Function;
+    const handler = emitEventCall?.[2] as (args: any) => Promise<any>;
 
     client.emitEvent.mockRejectedValueOnce(new Error("Auth failed"));
 

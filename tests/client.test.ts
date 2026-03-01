@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MeshesApiClient } from "../src/client.js";
 
 globalThis.fetch = vi.fn();
@@ -27,9 +27,9 @@ describe("MeshesApiClient", () => {
     const call = vi.mocked(fetch).mock.calls[0];
     expect(call[0]).toBe("https://api.test.io/api/v1/workspaces");
     expect(call[1]?.headers).toHaveProperty("Authorization");
-    expect(
-      (call[1]?.headers as Record<string, string>)["Authorization"]
-    ).toMatch(/^Bearer /);
+    expect((call[1]?.headers as Record<string, string>).Authorization).toMatch(
+      /^Bearer /,
+    );
   });
 
   it("should handle network errors gracefully", async () => {
@@ -40,7 +40,7 @@ describe("MeshesApiClient", () => {
     } as Response);
 
     await expect(client.listWorkspaces()).rejects.toThrow(
-      "Meshes API 401: Unauthorized"
+      "Meshes API 401: Unauthorized",
     );
   });
 
@@ -52,7 +52,7 @@ describe("MeshesApiClient", () => {
     } as Response);
 
     await expect(client.listWorkspaces()).rejects.toThrow(
-      "Meshes API 429: Too Many Requests"
+      "Meshes API 429: Too Many Requests",
     );
   });
 });

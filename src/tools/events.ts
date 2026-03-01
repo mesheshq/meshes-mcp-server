@@ -19,12 +19,12 @@ export function registerEventTools(server: McpServer, client: MeshesApiClient) {
           .string()
           .min(1)
           .describe(
-            "Event type (e.g., 'user.signup', 'payment.failed', 'form.submitted')"
+            "Event type (e.g., 'user.signup', 'payment.failed', 'form.submitted')",
           ),
         payload: z
           .record(z.string(), z.unknown())
           .describe(
-            "Event payload. Include 'email' for person-related events. Supports: email, id, ip_address, name, first_name, last_name, phone, resource_url, plus custom fields."
+            "Event payload. Include 'email' for person-related events. Supports: email, id, ip_address, name, first_name, last_name, phone, resource_url, plus custom fields.",
           ),
         resource: z
           .string()
@@ -65,7 +65,7 @@ export function registerEventTools(server: McpServer, client: MeshesApiClient) {
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -83,7 +83,7 @@ export function registerEventTools(server: McpServer, client: MeshesApiClient) {
               payload: z.record(z.string(), z.unknown()),
               resource: z.string().optional(),
               resource_id: z.string().optional(),
-            })
+            }),
           )
           .min(1)
           .max(100)
@@ -102,6 +102,6 @@ export function registerEventTools(server: McpServer, client: MeshesApiClient) {
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 }

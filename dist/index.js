@@ -12,7 +12,7 @@ const SECRET_KEY = process.env.MESHES_SECRET_KEY;
 const ORG_ID = process.env.MESHES_ORG_ID;
 const BASE_URL = process.env.MESHES_API_URL || "https://api.meshes.io";
 if (!ACCESS_KEY || !SECRET_KEY || !ORG_ID) {
-    let missing = [];
+    const missing = [];
     if (!ACCESS_KEY)
         missing.push("MESHES_ACCESS_KEY");
     if (!SECRET_KEY)

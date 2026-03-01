@@ -1,8 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { MeshesApiClient } from "../client.js";
-import { toolError, toolOk } from "../utils.js";
 import type { EventStatus } from "../types.js";
+import { toolError, toolOk } from "../utils.js";
 
 const EVENT_STATUSES = [
   "pending",
@@ -13,7 +13,7 @@ const EVENT_STATUSES = [
 
 export function registerDeliveryTools(
   server: McpServer,
-  client: MeshesApiClient
+  client: MeshesApiClient,
 ) {
   server.registerTool(
     "meshes_get_workspace_events",
@@ -70,12 +70,12 @@ export function registerDeliveryTools(
             status: status as EventStatus | undefined,
             resource,
             resource_id,
-          })
+          }),
         );
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -109,7 +109,7 @@ export function registerDeliveryTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -134,7 +134,7 @@ export function registerDeliveryTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -159,7 +159,7 @@ export function registerDeliveryTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 
   server.registerTool(
@@ -188,6 +188,6 @@ export function registerDeliveryTools(
       } catch (e) {
         return toolError(e);
       }
-    }
+    },
   );
 }

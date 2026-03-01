@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { createServer } from "../src/server.js";
+import { describe, expect, it } from "vitest";
 import { MeshesApiClient } from "../src/client.js";
+import { createServer } from "../src/server.js";
 
 describe("Server", () => {
   it("instantiates the server and registers tools", async () => {

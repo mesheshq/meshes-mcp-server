@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MeshesApiClient } from "../../src/client.js";
 import { registerDeliveryTools } from "../../src/tools/deliveries.js";
 
@@ -25,6 +25,7 @@ describe("delivery tools", () => {
     client = new MeshesApiClient({} as any);
     server = new McpServer({ name: "test", version: "1.0.0" });
     vi.spyOn(server, "registerTool");
+
     registerDeliveryTools(server, client as any);
   });
 
@@ -41,7 +42,7 @@ describe("delivery tools", () => {
     const call = vi
       .mocked(server.registerTool)
       .mock.calls.find((c) => c[0] === "meshes_get_workspace_events");
-    const handler = call![2] as Function;
+    const handler = call?.[2] as (args: any) => Promise<any>;
 
     client.getWorkspaceEvents.mockResolvedValueOnce({ records: [] });
 
