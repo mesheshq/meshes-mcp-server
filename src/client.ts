@@ -1,8 +1,7 @@
-/**
- * Meshes API client — matches the OpenAPI spec at https://docs.meshes.dev
- * Base URL: https://api.meshes.io
- */
-
+import {
+  type MeshesOptionalRequestOptions,
+  MeshesApiClient as MeshesSdkClient,
+} from '@mesheshq/api';
 import type {
   Connection,
   EventStatus,
@@ -16,77 +15,104 @@ import type {
   Workspace,
 } from './types.js';
 
-// ── JWT Token Generation ──────────────────────────────────────
-// Meshes uses short-lived HS256 JWTs for machine-to-machine auth.
-// See: https://meshes.io/docs/api/authentication
+type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-async function mintJwt(config: MeshesConfig): Promise<string> {
-  // Dynamic import — jose is an ESM package
-  const { SignJWT } = await import('jose');
-
-  const key = new TextEncoder().encode(config.secretKey);
-
-  const token = await new SignJWT({ org: config.orgId })
-    .setProtectedHeader({ alg: 'HS256', typ: 'JWT', kid: config.accessKey })
-    .setIssuer(`urn:meshes:m2m:${config.accessKey}`)
-    .setAudience('meshes-api')
-    .setIssuedAt()
-    .setExpirationTime('30s')
-    .sign(key);
-
-  return token;
+function normalizeApiBaseUrl(baseUrl: string): string {
+  const trimmed = baseUrl.replace(/\/+$/, '');
+  return /\/api\/v\d+$/i.test(trimmed) ? trimmed : `${trimmed}/api/v1`;
 }
 
-// ── Client ────────────────────────────────────────────────────
+function formatApiErrorDetail(detail: unknown): string {
+  if (typeof detail === 'string') return detail;
+  if (detail === null || detail === undefined) return 'Unknown error';
+  try {
+    return JSON.stringify(detail);
+  } catch {
+    return String(detail);
+  }
+}
 
 export class MeshesApiClient {
-  private config: MeshesConfig;
+  private apiClient: MeshesSdkClient;
 
   constructor(config: MeshesConfig) {
-    this.config = config;
+    this.apiClient = new MeshesSdkClient(
+      config.orgId,
+      config.accessKey,
+      config.secretKey,
+      { apiBaseUrl: normalizeApiBaseUrl(config.baseUrl) },
+    );
   }
 
   private async request<T>(
     path: string,
-    options: RequestInit = {},
+    options: { method?: RequestMethod; body?: unknown } = {},
   ): Promise<T> {
-    const token = await mintJwt(this.config);
-    const url = `${this.config.baseUrl}${path}`;
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
+    const method = options.method || 'GET';
 
-    if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`Meshes API ${response.status}: ${body}`);
+    try {
+      switch (method) {
+        case 'GET':
+          return (await this.apiClient.get<T>(path)) as T;
+        case 'POST':
+          return (await this.apiClient.post<T, unknown>(
+            path,
+            options.body,
+          )) as T;
+        case 'PUT':
+          return (await this.apiClient.put<T, unknown>(
+            path,
+            options.body,
+          )) as T;
+        case 'DELETE': {
+          const deleteOptions =
+            options.body === undefined
+              ? undefined
+              : ({
+                  body: options.body,
+                } as unknown as MeshesOptionalRequestOptions);
+          return (await this.apiClient.delete<T>(path, deleteOptions)) as T;
+        }
+      }
+    } catch (error) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'data' in error &&
+        typeof (error as { data?: unknown }).data === 'object' &&
+        (error as { data?: { status?: unknown } }).data
+      ) {
+        const data = (
+          error as {
+            data?: { status?: number; statusText?: string; data?: unknown };
+          }
+        ).data;
+        if (data?.status) {
+          const detail = formatApiErrorDetail(data.data ?? data.statusText);
+          throw new Error(`Meshes API ${data.status}: ${detail}`);
+        }
+      }
+      throw error instanceof Error ? error : new Error(String(error));
     }
-
-    if (response.status === 204) return {} as T;
-    return response.json() as Promise<T>;
   }
 
   // ── Workspaces ────────────────────────────────────────────
 
   listWorkspaces(): Promise<PaginatedResponse<Workspace>> {
-    return this.request('/api/v1/workspaces');
+    return this.request('/workspaces');
   }
 
   getWorkspace(id: string): Promise<Workspace> {
-    return this.request(`/api/v1/workspaces/${id}`);
+    return this.request(`/workspaces/${id}`);
   }
 
   createWorkspace(params: {
     name: string;
     description?: string;
   }): Promise<{ workspace: Workspace }> {
-    return this.request('/api/v1/workspaces', {
+    return this.request('/workspaces', {
       method: 'POST',
-      body: JSON.stringify(params),
+      body: params,
     });
   }
 
@@ -94,18 +120,18 @@ export class MeshesApiClient {
     id: string,
     params: { name: string; description?: string | null },
   ): Promise<Workspace> {
-    return this.request(`/api/v1/workspaces/${id}`, {
+    return this.request(`/workspaces/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(params),
+      body: params,
     });
   }
 
   getWorkspaceConnections(id: string): Promise<PaginatedResponse<Connection>> {
-    return this.request(`/api/v1/workspaces/${id}/connections`);
+    return this.request(`/workspaces/${id}/connections`);
   }
 
   getWorkspaceRules(id: string): Promise<PaginatedResponse<Rule>> {
-    return this.request(`/api/v1/workspaces/${id}/rules`);
+    return this.request(`/workspaces/${id}/rules`);
   }
 
   getWorkspaceEvents(
@@ -127,17 +153,17 @@ export class MeshesApiClient {
     if (params?.resource) query.set('resource', params.resource);
     if (params?.resource_id) query.set('resource_id', params.resource_id);
     const qs = query.toString();
-    return this.request(`/api/v1/workspaces/${id}/events${qs ? `?${qs}` : ''}`);
+    return this.request(`/workspaces/${id}/events${qs ? `?${qs}` : ''}`);
   }
 
   // ── Connections ───────────────────────────────────────────
 
   listConnections(): Promise<PaginatedResponse<Connection>> {
-    return this.request('/api/v1/connections');
+    return this.request('/connections');
   }
 
   getConnection(id: string): Promise<Connection> {
-    return this.request(`/api/v1/connections/${id}`);
+    return this.request(`/connections/${id}`);
   }
 
   createConnection(params: {
@@ -147,9 +173,9 @@ export class MeshesApiClient {
     metadata: Record<string, unknown>;
     hidden?: boolean;
   }): Promise<{ connection: Connection }> {
-    return this.request('/api/v1/connections', {
+    return this.request('/connections', {
       method: 'POST',
-      body: JSON.stringify(params),
+      body: params,
     });
   }
 
@@ -161,9 +187,9 @@ export class MeshesApiClient {
       hidden?: boolean;
     },
   ): Promise<Connection> {
-    return this.request(`/api/v1/connections/${id}`, {
+    return this.request(`/connections/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(params),
+      body: params,
     });
   }
 
@@ -171,23 +197,23 @@ export class MeshesApiClient {
     id: string,
     forceDelete?: boolean,
   ): Promise<{ id: string; type: IntegrationType }> {
-    return this.request(`/api/v1/connections/${id}`, {
+    return this.request(`/connections/${id}`, {
       method: 'DELETE',
-      body: forceDelete ? JSON.stringify({ force_delete: true }) : undefined,
+      body: forceDelete ? { force_delete: true } : undefined,
     });
   }
 
   getConnectionActions(id: string): Promise<unknown> {
-    return this.request(`/api/v1/connections/${id}/actions`);
+    return this.request(`/connections/${id}/actions`);
   }
 
   getConnectionFields(id: string, refresh?: boolean): Promise<unknown> {
     const qs = refresh ? '?refresh=true' : '';
-    return this.request(`/api/v1/connections/${id}/fields${qs}`);
+    return this.request(`/connections/${id}/fields${qs}`);
   }
 
   getConnectionDefaultMappings(id: string): Promise<unknown> {
-    return this.request(`/api/v1/connections/${id}/mappings/default`);
+    return this.request(`/connections/${id}/mappings/default`);
   }
 
   // ── Rules ─────────────────────────────────────────────────
@@ -202,11 +228,11 @@ export class MeshesApiClient {
     if (params?.resource) query.set('resource', params.resource);
     if (params?.resource_id) query.set('resource_id', params.resource_id);
     const qs = query.toString();
-    return this.request(`/api/v1/rules${qs ? `?${qs}` : ''}`);
+    return this.request(`/rules${qs ? `?${qs}` : ''}`);
   }
 
   getRule(id: string): Promise<Rule> {
-    return this.request(`/api/v1/rules/${id}`);
+    return this.request(`/rules/${id}`);
   }
 
   createRule(params: {
@@ -219,9 +245,9 @@ export class MeshesApiClient {
     active?: boolean;
     hidden?: boolean;
   }): Promise<{ rule: Rule }> {
-    return this.request('/api/v1/rules', {
+    return this.request('/rules', {
       method: 'POST',
-      body: JSON.stringify(params),
+      body: params,
     });
   }
 
@@ -231,7 +257,7 @@ export class MeshesApiClient {
     type: IntegrationType;
     event: string;
   }> {
-    return this.request(`/api/v1/rules/${id}`, { method: 'DELETE' });
+    return this.request(`/rules/${id}`, { method: 'DELETE' });
   }
 
   // ── Events ────────────────────────────────────────────────
@@ -244,7 +270,7 @@ export class MeshesApiClient {
     if (params?.limit) query.set('limit', String(params.limit));
     if (params?.cursor) query.set('cursor', params.cursor);
     const qs = query.toString();
-    return this.request(`/api/v1/events${qs ? `?${qs}` : ''}`);
+    return this.request(`/events${qs ? `?${qs}` : ''}`);
   }
 
   emitEvent(params: {
@@ -262,9 +288,9 @@ export class MeshesApiClient {
       created_at: string;
     };
   }> {
-    return this.request('/api/v1/events', {
+    return this.request('/events', {
       method: 'POST',
-      body: JSON.stringify(params),
+      body: params,
     });
   }
 
@@ -277,22 +303,22 @@ export class MeshesApiClient {
       resource_id?: string;
     }>,
   ): Promise<{ count: number; error_count?: number; records: unknown[] }> {
-    return this.request('/api/v1/events/bulk', {
+    return this.request('/events/bulk', {
       method: 'POST',
-      body: JSON.stringify(events),
+      body: events,
     });
   }
 
   getEvent(id: string): Promise<MeshesEvent> {
-    return this.request(`/api/v1/events/${id}`);
+    return this.request(`/events/${id}`);
   }
 
   getEventPayload(id: string): Promise<MeshesEvent> {
-    return this.request(`/api/v1/events/${id}/payload`);
+    return this.request(`/events/${id}/payload`);
   }
 
   retryEventRule(eventId: string, ruleId: string): Promise<RuleEvent> {
-    return this.request(`/api/v1/events/${eventId}/rules/${ruleId}/retry`, {
+    return this.request(`/events/${eventId}/rules/${ruleId}/retry`, {
       method: 'POST',
     });
   }
@@ -300,6 +326,6 @@ export class MeshesApiClient {
   // ── Integrations ──────────────────────────────────────────
 
   listIntegrations(): Promise<PaginatedResponse<unknown>> {
-    return this.request('/api/v1/integrations');
+    return this.request('/integrations');
   }
 }
