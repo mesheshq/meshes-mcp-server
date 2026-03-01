@@ -62,4 +62,32 @@ describe('delivery tools', () => {
     expect(result.isError).toBeUndefined();
     expect(result.content[0].text).toContain('records');
   });
+
+  it('event payload handler returns toolError on failure', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_get_event_payload');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.getEventPayload.mockRejectedValueOnce(new Error('Payload denied'));
+
+    const result = await handler({ event_id: 'evt_123' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Payload denied');
+  });
+
+  it('retry handler returns toolError on failure', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_retry_event_rule');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.retryEventRule.mockRejectedValueOnce(new Error('Retry denied'));
+
+    const result = await handler({ event_id: 'evt_123', rule_id: 'rule_123' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Retry denied');
+  });
 });

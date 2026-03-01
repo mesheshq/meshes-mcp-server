@@ -65,4 +65,39 @@ describe('rule tools', () => {
       hidden: undefined,
     });
   });
+
+  it('list handler passes through filters', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_list_rules');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.listRules.mockResolvedValueOnce({ records: [] });
+
+    await handler({
+      event: 'user.signup',
+      resource: 'user',
+      resource_id: 'u_1',
+    });
+
+    expect(client.listRules).toHaveBeenCalledWith({
+      event: 'user.signup',
+      resource: 'user',
+      resource_id: 'u_1',
+    });
+  });
+
+  it('delete handler returns toolError on failure', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_delete_rule');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.deleteRule.mockRejectedValueOnce(new Error('Delete failed'));
+
+    const result = await handler({ rule_id: 'rule_123' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Delete failed');
+  });
 });
