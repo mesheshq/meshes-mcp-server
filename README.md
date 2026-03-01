@@ -14,77 +14,77 @@ create routing rules, and inspect deliveries from any MCP-compatible client.
 ## Setup
 
 Create a free Meshes account and create Machine Keys in the dashboard
-under Settings → Machine Keys.
+under Profile → API Keys.
 
 ### Claude Code
 
-\`\`\`bash
+```bash
 claude mcp add meshes \
  -e MESHES_ACCESS_KEY=your_access_key \
  -e MESHES_SECRET_KEY=your_secret_key \
  -e MESHES_ORG_ID=your_org_id \
  -- npx -y @mesheshq/mcp-server
-\`\`\`
+```
 
 ### Cursor
 
 Open Cursor Settings → MCP → Add new global MCP server:
 
-\`\`\`json
+```json
 {
-"mcpServers": {
-"meshes": {
-"command": "npx",
-"args": ["-y", "@mesheshq/mcp-server"],
-"env": {
-"MESHES_ACCESS_KEY": "your_access_key",
-"MESHES_SECRET_KEY": "your_secret_key",
-"MESHES_ORG_ID": "your_organization_uuid"
+  "mcpServers": {
+    "meshes": {
+      "command": "npx",
+      "args": ["-y", "@mesheshq/mcp-server"],
+      "env": {
+        "MESHES_ACCESS_KEY": "your_access_key",
+        "MESHES_SECRET_KEY": "your_secret_key",
+        "MESHES_ORG_ID": "your_organization_uuid"
+      }
+    }
+  }
 }
-}
-}
-}
-\`\`\`
+```
 
 ### Claude Desktop
 
 Open Claude Desktop → Settings → Developer → Edit Config:
 
-\`\`\`json
+```json
 {
-"mcpServers": {
-"meshes": {
-"command": "npx",
-"args": ["-y", "@mesheshq/mcp-server"],
-"env": {
-"MESHES_ACCESS_KEY": "your_access_key",
-"MESHES_SECRET_KEY": "your_secret_key",
-"MESHES_ORG_ID": "your_organization_uuid"
+  "mcpServers": {
+    "meshes": {
+      "command": "npx",
+      "args": ["-y", "@mesheshq/mcp-server"],
+      "env": {
+        "MESHES_ACCESS_KEY": "your_access_key",
+        "MESHES_SECRET_KEY": "your_secret_key",
+        "MESHES_ORG_ID": "your_organization_uuid"
+      }
+    }
+  }
 }
-}
-}
-}
-\`\`\`
+```
 
 ### Windsurf
 
 Add to your Windsurf MCP configuration:
 
-\`\`\`json
+```json
 {
-"mcpServers": {
-"meshes": {
-"command": "npx",
-"args": ["-y", "@mesheshq/mcp-server"],
-"env": {
-"MESHES_ACCESS_KEY": "your_access_key",
-"MESHES_SECRET_KEY": "your_secret_key",
-"MESHES_ORG_ID": "your_organization_uuid"
+  "mcpServers": {
+    "meshes": {
+      "command": "npx",
+      "args": ["-y", "@mesheshq/mcp-server"],
+      "env": {
+        "MESHES_ACCESS_KEY": "your_access_key",
+        "MESHES_SECRET_KEY": "your_secret_key",
+        "MESHES_ORG_ID": "your_organization_uuid"
+      }
+    }
+  }
 }
-}
-}
-}
-\`\`\`
+```
 
 > **Security note:** MCP config files contain your secret key. They
 > live in your home directory (e.g. `~/.cursor/mcp.json`), not your
@@ -130,13 +130,13 @@ Add to your Windsurf MCP configuration:
 
 ## Development
 
-\`\`\`bash
+```bash
 git clone https://github.com/mesheshq/meshes-mcp-server.git
 cd meshes-mcp-server
 npm install
 npm run build
 npm test
-\`\`\`
+```
 
 ## What is Meshes?
 
