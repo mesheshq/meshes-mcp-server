@@ -1,8 +1,10 @@
+# This workflow will publish a package to npm when a release is created
+
 name: Publish
 
 on:
-  push:
-    tags: ['v*']
+  release:
+    types: [published]
 
 jobs:
   publish:

@@ -1,3 +1,5 @@
+# This workflow will run tests on push to main, PRs, and new version tags
+
 name: CI
 
 on:
