@@ -72,4 +72,34 @@ describe('workspace tools', () => {
       description: 'desc',
     });
   });
+
+  it('workspace connections handler returns toolError on failure', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_get_workspace_connections');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.getWorkspaceConnections.mockRejectedValueOnce(
+      new Error('Workspace connections error'),
+    );
+
+    const result = await handler({ workspace_id: 'ws_123' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Workspace connections error');
+  });
+
+  it('workspace rules handler returns toolError on failure', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_get_workspace_rules');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.getWorkspaceRules.mockRejectedValueOnce(new Error('Rules error'));
+
+    const result = await handler({ workspace_id: 'ws_123' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Rules error');
+  });
 });

@@ -79,4 +79,20 @@ describe('emit-event tool', () => {
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toBe('Auth failed');
   });
+
+  it('bulk handler returns toolError on failure', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_emit_bulk_events');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.emitBulkEvents.mockRejectedValueOnce(new Error('Bulk failed'));
+
+    const result = await handler({
+      events: [{ workspace: 'ws', event: 'user.signup', payload: {} }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Bulk failed');
+  });
 });

@@ -11,14 +11,14 @@ import { createServer } from './server.js';
 
 const ACCESS_KEY = process.env.MESHES_ACCESS_KEY;
 const SECRET_KEY = process.env.MESHES_SECRET_KEY;
-const ORG_ID = process.env.MESHES_ORG_ID;
+const ORG_ID = process.env.MESHES_ORG_ID || process.env.MESHES_ORGANIZATION_ID;
 const BASE_URL = process.env.MESHES_API_URL || 'https://api.meshes.io';
 
 if (!ACCESS_KEY || !SECRET_KEY || !ORG_ID) {
   const missing = [];
   if (!ACCESS_KEY) missing.push('MESHES_ACCESS_KEY');
   if (!SECRET_KEY) missing.push('MESHES_SECRET_KEY');
-  if (!ORG_ID) missing.push('MESHES_ORG_ID');
+  if (!ORG_ID) missing.push('MESHES_ORG_ID (or MESHES_ORGANIZATION_ID)');
 
   console.error(
     `Error: Missing required environment variable ${missing.join(', ')}\n` +
@@ -36,17 +36,24 @@ if (!ACCESS_KEY || !SECRET_KEY || !ORG_ID) {
       `    }\n` +
       `  }\n` +
       `}\n\n` +
-      `Find your credentials in the Meshes dashboard under Settings → Machine Keys.`,
+      `Find your credentials in the Meshes dashboard under Profile → API Keys.`,
   );
   process.exit(1);
 }
 
-const client = new MeshesApiClient({
-  accessKey: ACCESS_KEY,
-  secretKey: SECRET_KEY,
-  orgId: ORG_ID,
-  baseUrl: BASE_URL,
-});
+let client: MeshesApiClient;
+try {
+  client = new MeshesApiClient({
+    accessKey: ACCESS_KEY,
+    secretKey: SECRET_KEY,
+    orgId: ORG_ID,
+    baseUrl: BASE_URL,
+  });
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`Failed to initialize Meshes API client: ${message}`);
+  process.exit(1);
+}
 
 const server = createServer(client);
 

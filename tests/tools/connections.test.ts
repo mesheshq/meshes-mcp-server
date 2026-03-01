@@ -81,4 +81,36 @@ describe('connection tools', () => {
 
     expect(client.deleteConnection).toHaveBeenCalledWith('conn_123', true);
   });
+
+  it('default mappings handler returns toolError on failure', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find(
+        (c) => c[0] === 'meshes_get_connection_default_mappings',
+      );
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.getConnectionDefaultMappings.mockRejectedValueOnce(
+      new Error('Mappings unavailable'),
+    );
+
+    const result = await handler({ connection_id: 'conn_123' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Mappings unavailable');
+  });
+
+  it('list integrations handler returns toolError on failure', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_list_integrations');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.listIntegrations.mockRejectedValueOnce(new Error('Denied'));
+
+    const result = await handler({});
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Denied');
+  });
 });

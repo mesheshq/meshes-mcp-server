@@ -3,4 +3,5 @@ dist/
 **/dist/**
 *.tgz
 .env
+.env*.local
 coverage/
