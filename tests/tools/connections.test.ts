@@ -69,6 +69,15 @@ describe('connection tools', () => {
     });
   });
 
+  it('create handler schema allows slack integration type', () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_create_connection');
+    const typeSchema = (call?.[1] as any).inputSchema.type;
+
+    expect(typeSchema.parse('slack')).toBe('slack');
+  });
+
   it('delete handler manages force deletion flag', async () => {
     const call = vi
       .mocked(server.registerTool)

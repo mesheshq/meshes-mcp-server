@@ -1,21 +1,8 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import type { MeshesApiClient } from '../client.js';
-import type { IntegrationType } from '../types.js';
+import { INTEGRATION_TYPES, type IntegrationType } from '../types.js';
 import { toolError, toolOk } from '../utils.js';
-
-const INTEGRATION_TYPES = [
-  'activecampaign',
-  'aweber',
-  'hubspot',
-  'intercom',
-  'mailchimp',
-  'mailerlite',
-  'resend',
-  'salesforce',
-  'webhook',
-  'zoom',
-] as const;
 
 export function registerConnectionTools(
   server: McpServer,

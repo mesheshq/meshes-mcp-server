@@ -12,7 +12,7 @@ create routing rules, and inspect deliveries from any MCP-compatible client.
 - **Emit Events** — send product events (signups, payments, cancellations) to Meshes
 - **Manage Workspaces** — list and configure workspaces
 - **Routing Rules** — create and update event routing rules
-- **Connections** — manage integration connections (HubSpot, Salesforce, Mailchimp, etc.)
+- **Connections** — manage integration connections (HubSpot, Salesforce, Slack, Mailchimp, etc.)
 - **Delivery Status** — inspect event delivery logs and retry status
 
 ## Setup
