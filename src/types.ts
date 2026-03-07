@@ -1,14 +1,18 @@
-export type IntegrationType =
-  | 'activecampaign'
-  | 'aweber'
-  | 'hubspot'
-  | 'intercom'
-  | 'mailchimp'
-  | 'mailerlite'
-  | 'resend'
-  | 'salesforce'
-  | 'webhook'
-  | 'zoom';
+export const INTEGRATION_TYPES = [
+  'activecampaign',
+  'aweber',
+  'hubspot',
+  'intercom',
+  'mailchimp',
+  'mailerlite',
+  'resend',
+  'salesforce',
+  'slack',
+  'webhook',
+  'zoom',
+] as const;
+
+export type IntegrationType = (typeof INTEGRATION_TYPES)[number];
 
 export type EventStatus = 'pending' | 'processing' | 'completed' | 'failed';
 
