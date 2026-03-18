@@ -13,6 +13,8 @@ vi.mock('../../src/client.js', async (importOriginal) => {
       createWorkspace = vi.fn();
       updateWorkspace = vi.fn();
       getWorkspaceConnections = vi.fn();
+      getWorkspaceEventTypes = vi.fn();
+      getWorkspaceResources = vi.fn();
       getWorkspaceRules = vi.fn();
     },
   };
@@ -37,6 +39,8 @@ describe('workspace tools', () => {
     expect(tools).toContain('meshes_create_workspace');
     expect(tools).toContain('meshes_update_workspace');
     expect(tools).toContain('meshes_get_workspace_connections');
+    expect(tools).toContain('meshes_get_workspace_event_types');
+    expect(tools).toContain('meshes_get_workspace_resources');
     expect(tools).toContain('meshes_get_workspace_rules');
   });
 
@@ -101,5 +105,38 @@ describe('workspace tools', () => {
 
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toBe('Rules error');
+  });
+
+  it('workspace event types handler returns ok', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_get_workspace_event_types');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.getWorkspaceEventTypes.mockResolvedValueOnce([
+      { key: 'user.signup' },
+    ]);
+
+    const result = await handler({ workspace_id: 'ws_123' });
+
+    expect(client.getWorkspaceEventTypes).toHaveBeenCalledWith('ws_123');
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain('user.signup');
+  });
+
+  it('workspace resources handler returns toolError on failure', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_get_workspace_resources');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.getWorkspaceResources.mockRejectedValueOnce(
+      new Error('Resources error'),
+    );
+
+    const result = await handler({ workspace_id: 'ws_123' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Resources error');
   });
 });

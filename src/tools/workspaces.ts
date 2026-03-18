@@ -3,13 +3,6 @@ import { z } from 'zod';
 import type { MeshesApiClient } from '../client.js';
 import { toolError, toolOk } from '../utils.js';
 
-const _EVENT_STATUSES = [
-  'pending',
-  'processing',
-  'completed',
-  'failed',
-] as const;
-
 export function registerWorkspaceTools(
   server: McpServer,
   client: MeshesApiClient,
@@ -149,6 +142,56 @@ export function registerWorkspaceTools(
     async ({ workspace_id }) => {
       try {
         return toolOk(await client.getWorkspaceConnections(workspace_id));
+      } catch (e) {
+        return toolError(e);
+      }
+    },
+  );
+
+  server.registerTool(
+    'meshes_get_workspace_event_types',
+    {
+      title: 'Get Workspace Event Types',
+      description:
+        'List the event types configured for a workspace, including each key, label, description, and active state.',
+      inputSchema: {
+        workspace_id: z.string().uuid().describe('The workspace UUID'),
+      },
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async ({ workspace_id }) => {
+      try {
+        return toolOk(await client.getWorkspaceEventTypes(workspace_id));
+      } catch (e) {
+        return toolError(e);
+      }
+    },
+  );
+
+  server.registerTool(
+    'meshes_get_workspace_resources',
+    {
+      title: 'Get Workspace Resources',
+      description:
+        'List the resource types configured for a workspace, including each key, label, description, and active state.',
+      inputSchema: {
+        workspace_id: z.string().uuid().describe('The workspace UUID'),
+      },
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async ({ workspace_id }) => {
+      try {
+        return toolOk(await client.getWorkspaceResources(workspace_id));
       } catch (e) {
         return toolError(e);
       }
