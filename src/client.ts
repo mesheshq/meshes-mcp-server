@@ -4,15 +4,24 @@ import {
 } from '@mesheshq/api';
 import type {
   Connection,
+  ConnectionDefaultMappingResult,
+  CreatedSession,
   EventStatus,
   IntegrationType,
+  MappingSchema,
   MeshesConfig,
   MeshesEvent,
   PaginatedResponse,
   Rule,
   RuleEvent,
   RuleMetadata,
+  Session,
+  SessionRecord,
+  SessionRole,
+  SessionScope,
+  SessionStatus,
   Workspace,
+  WorkspaceCatalogEntry,
 } from './types.js';
 
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -30,6 +39,21 @@ function formatApiErrorDetail(detail: unknown): string {
   } catch {
     return String(detail);
   }
+}
+
+function buildQueryString(
+  params: Record<string, string | number | boolean | undefined | null>,
+): string {
+  const query = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null) {
+      query.set(key, String(value));
+    }
+  }
+
+  const qs = query.toString();
+  return qs ? `?${qs}` : '';
 }
 
 export class MeshesApiClient {
@@ -134,6 +158,14 @@ export class MeshesApiClient {
     return this.request(`/workspaces/${id}/rules`);
   }
 
+  getWorkspaceEventTypes(id: string): Promise<WorkspaceCatalogEntry[]> {
+    return this.request(`/workspaces/${id}/event-types`);
+  }
+
+  getWorkspaceResources(id: string): Promise<WorkspaceCatalogEntry[]> {
+    return this.request(`/workspaces/${id}/resources`);
+  }
+
   getWorkspaceEvents(
     id: string,
     params?: {
@@ -145,15 +177,16 @@ export class MeshesApiClient {
       resource_id?: string;
     },
   ): Promise<PaginatedResponse<MeshesEvent>> {
-    const query = new URLSearchParams();
-    if (params?.limit) query.set('limit', String(params.limit));
-    if (params?.cursor) query.set('cursor', params.cursor);
-    if (params?.event) query.set('event', params.event);
-    if (params?.status) query.set('status', params.status);
-    if (params?.resource) query.set('resource', params.resource);
-    if (params?.resource_id) query.set('resource_id', params.resource_id);
-    const qs = query.toString();
-    return this.request(`/workspaces/${id}/events${qs ? `?${qs}` : ''}`);
+    return this.request(
+      `/workspaces/${id}/events${buildQueryString({
+        limit: params?.limit,
+        cursor: params?.cursor,
+        event: params?.event,
+        status: params?.status,
+        resource: params?.resource,
+        resource_id: params?.resource_id,
+      })}`,
+    );
   }
 
   // ── Connections ───────────────────────────────────────────
@@ -216,6 +249,22 @@ export class MeshesApiClient {
     return this.request(`/connections/${id}/mappings/default`);
   }
 
+  updateConnectionDefaultMappings(
+    id: string,
+    params: {
+      workspace_id?: string;
+      mapping_id?: string;
+      expected_version?: number;
+      name?: string;
+      schema: MappingSchema;
+    },
+  ): Promise<ConnectionDefaultMappingResult> {
+    return this.request(`/connections/${id}/mappings/default`, {
+      method: 'PUT',
+      body: params,
+    });
+  }
+
   // ── Rules ─────────────────────────────────────────────────
 
   listRules(params?: {
@@ -223,12 +272,13 @@ export class MeshesApiClient {
     resource?: string;
     resource_id?: string;
   }): Promise<PaginatedResponse<Rule>> {
-    const query = new URLSearchParams();
-    if (params?.event) query.set('event', params.event);
-    if (params?.resource) query.set('resource', params.resource);
-    if (params?.resource_id) query.set('resource_id', params.resource_id);
-    const qs = query.toString();
-    return this.request(`/rules${qs ? `?${qs}` : ''}`);
+    return this.request(
+      `/rules${buildQueryString({
+        event: params?.event,
+        resource: params?.resource,
+        resource_id: params?.resource_id,
+      })}`,
+    );
   }
 
   getRule(id: string): Promise<Rule> {
@@ -266,11 +316,12 @@ export class MeshesApiClient {
     limit?: number;
     cursor?: string;
   }): Promise<PaginatedResponse<MeshesEvent>> {
-    const query = new URLSearchParams();
-    if (params?.limit) query.set('limit', String(params.limit));
-    if (params?.cursor) query.set('cursor', params.cursor);
-    const qs = query.toString();
-    return this.request(`/events${qs ? `?${qs}` : ''}`);
+    return this.request(
+      `/events${buildQueryString({
+        limit: params?.limit,
+        cursor: params?.cursor,
+      })}`,
+    );
   }
 
   emitEvent(params: {
@@ -327,5 +378,51 @@ export class MeshesApiClient {
 
   listIntegrations(): Promise<PaginatedResponse<unknown>> {
     return this.request('/integrations');
+  }
+
+  // ── Sessions ──────────────────────────────────────────────
+
+  createSession(params: {
+    workspace_id: string;
+    role?: SessionRole;
+    external_user_id?: string;
+    ttl_seconds?: number;
+    launch_ttl_seconds?: number;
+    launch_path?: string;
+    allowed_origins?: string[];
+    scopes?: SessionScope[];
+  }): Promise<CreatedSession> {
+    return this.request('/sessions', {
+      method: 'POST',
+      body: params,
+    });
+  }
+
+  listSessions(params: {
+    workspace_id: string;
+    limit?: number;
+    cursor?: string;
+    status?: SessionStatus;
+  }): Promise<PaginatedResponse<SessionRecord>> {
+    return this.request(
+      `/sessions${buildQueryString({
+        workspace_id: params.workspace_id,
+        limit: params.limit,
+        cursor: params.cursor,
+        status: params.status,
+      })}`,
+    );
+  }
+
+  refreshSession(sessionId: string): Promise<Session> {
+    return this.request(`/sessions/${sessionId}/refresh`, {
+      method: 'POST',
+    });
+  }
+
+  revokeSession(sessionId: string): Promise<{ revoked: boolean }> {
+    return this.request(`/sessions/${sessionId}`, {
+      method: 'DELETE',
+    });
   }
 }

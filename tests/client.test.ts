@@ -75,6 +75,8 @@ describe('MeshesApiClient', () => {
       resource: 'user',
       resource_id: 'u_1',
     });
+    await client.getWorkspaceEventTypes('ws_123');
+    await client.getWorkspaceResources('ws_123');
 
     const calls = vi.mocked(fetch).mock.calls;
     expect(calls[0]?.[0]).toBe('https://api.test.io/api/v1/workspaces/ws_123');
@@ -94,6 +96,12 @@ describe('MeshesApiClient', () => {
     );
     expect(calls[5]?.[0]).toBe(
       'https://api.test.io/api/v1/workspaces/ws_123/events?limit=25&cursor=cur_1&event=user.signup&status=failed&resource=user&resource_id=u_1',
+    );
+    expect(calls[6]?.[0]).toBe(
+      'https://api.test.io/api/v1/workspaces/ws_123/event-types',
+    );
+    expect(calls[7]?.[0]).toBe(
+      'https://api.test.io/api/v1/workspaces/ws_123/resources',
     );
   });
 
@@ -117,6 +125,21 @@ describe('MeshesApiClient', () => {
     await client.getConnectionActions('conn_1');
     await client.getConnectionFields('conn_1', true);
     await client.getConnectionDefaultMappings('conn_1');
+    await client.updateConnectionDefaultMappings('conn_1', {
+      workspace_id: 'ws_1',
+      mapping_id: 'map_1',
+      expected_version: 2,
+      name: 'Default lead mapping',
+      schema: {
+        schema_version: 1,
+        fields: [
+          {
+            dest: 'email',
+            source: { type: 'path', value: 'email' },
+          },
+        ],
+      },
+    });
     await client.listRules({
       event: 'user.signup',
       resource: 'user',
@@ -159,19 +182,85 @@ describe('MeshesApiClient', () => {
     expect(calls[5]?.[0]).toBe(
       'https://api.test.io/api/v1/connections/conn_1/fields?refresh=true',
     );
-    expect(calls[7]?.[0]).toBe(
+    expect(calls[7]?.[1]?.method).toBe('PUT');
+    expect(calls[7]?.[1]?.body).toBe(
+      JSON.stringify({
+        workspace_id: 'ws_1',
+        mapping_id: 'map_1',
+        expected_version: 2,
+        name: 'Default lead mapping',
+        schema: {
+          schema_version: 1,
+          fields: [
+            {
+              dest: 'email',
+              source: { type: 'path', value: 'email' },
+            },
+          ],
+        },
+      }),
+    );
+    expect(calls[8]?.[0]).toBe(
       'https://api.test.io/api/v1/rules?event=user.signup&resource=user&resource_id=u_1',
     );
-    expect(calls[10]?.[1]?.method).toBe('DELETE');
-    expect(calls[11]?.[0]).toBe(
+    expect(calls[11]?.[1]?.method).toBe('DELETE');
+    expect(calls[12]?.[0]).toBe(
       'https://api.test.io/api/v1/events?limit=10&cursor=cur_2',
     );
-    expect(calls[12]?.[1]?.method).toBe('POST');
-    expect(calls[13]?.[0]).toBe('https://api.test.io/api/v1/events/bulk');
-    expect(calls[16]?.[0]).toBe(
+    expect(calls[13]?.[1]?.method).toBe('POST');
+    expect(calls[14]?.[0]).toBe('https://api.test.io/api/v1/events/bulk');
+    expect(calls[17]?.[0]).toBe(
       'https://api.test.io/api/v1/events/evt_1/rules/rule_1/retry',
     );
-    expect(calls[17]?.[0]).toBe('https://api.test.io/api/v1/integrations');
+    expect(calls[18]?.[0]).toBe('https://api.test.io/api/v1/integrations');
+  });
+
+  it('should map session methods to expected routes and verbs', async () => {
+    vi.mocked(fetch).mockResolvedValue(jsonResponse({ records: [] }));
+
+    await client.createSession({
+      workspace_id: '123e4567-e89b-12d3-a456-426614174111',
+      role: 'admin',
+      external_user_id: 'user_123',
+      ttl_seconds: 1200,
+      launch_ttl_seconds: 30,
+      launch_path: '/workspace/dashboard',
+      allowed_origins: ['https://app.example.com'],
+      scopes: ['events.payload:read'],
+    });
+    await client.listSessions({
+      workspace_id: '123e4567-e89b-12d3-a456-426614174111',
+      limit: 25,
+      cursor: 'cur_3',
+      status: 'active',
+    });
+    await client.refreshSession('sess_123');
+    await client.revokeSession('sess_123');
+
+    const calls = vi.mocked(fetch).mock.calls;
+    expect(calls[0]?.[0]).toBe('https://api.test.io/api/v1/sessions');
+    expect(calls[0]?.[1]?.method).toBe('POST');
+    expect(calls[0]?.[1]?.body).toBe(
+      JSON.stringify({
+        workspace_id: '123e4567-e89b-12d3-a456-426614174111',
+        role: 'admin',
+        external_user_id: 'user_123',
+        ttl_seconds: 1200,
+        launch_ttl_seconds: 30,
+        launch_path: '/workspace/dashboard',
+        allowed_origins: ['https://app.example.com'],
+        scopes: ['events.payload:read'],
+      }),
+    );
+    expect(calls[1]?.[0]).toBe(
+      'https://api.test.io/api/v1/sessions?workspace_id=123e4567-e89b-12d3-a456-426614174111&limit=25&cursor=cur_3&status=active',
+    );
+    expect(calls[2]?.[0]).toBe(
+      'https://api.test.io/api/v1/sessions/sess_123/refresh',
+    );
+    expect(calls[2]?.[1]?.method).toBe('POST');
+    expect(calls[3]?.[0]).toBe('https://api.test.io/api/v1/sessions/sess_123');
+    expect(calls[3]?.[1]?.method).toBe('DELETE');
   });
 
   it('should handle network errors gracefully', async () => {

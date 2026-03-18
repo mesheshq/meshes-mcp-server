@@ -4,6 +4,97 @@ import type { MeshesApiClient } from '../client.js';
 import { INTEGRATION_TYPES, type IntegrationType } from '../types.js';
 import { toolError, toolOk } from '../utils.js';
 
+const MAPPING_SCALAR_VALUE = z.union([
+  z.string().min(1).max(256),
+  z.number(),
+  z.boolean(),
+  z.null(),
+]);
+
+const MAPPING_SOURCE_SCHEMA = z.union([
+  z.object({
+    type: z.literal('literal'),
+    value: MAPPING_SCALAR_VALUE,
+  }),
+  z.object({
+    type: z.literal('path'),
+    value: z
+      .string()
+      .min(1)
+      .max(128)
+      .regex(
+        /^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)*$/,
+        'Must be a payload-relative selector like "email" or "user.email"',
+      ),
+  }),
+]);
+
+const MAPPING_TRANSFORM_SCHEMA = z.union([
+  z.object({
+    type: z.literal('to_string'),
+  }),
+  z.object({
+    type: z.literal('to_number'),
+  }),
+  z.object({
+    type: z.literal('to_boolean'),
+  }),
+  z.object({
+    type: z.literal('to_date'),
+    timezone: z.string().min(1).max(64).optional(),
+  }),
+  z.object({
+    type: z.literal('to_datetime'),
+    timezone: z.string().min(1).max(64).optional(),
+  }),
+  z.object({
+    type: z.literal('default'),
+    value: z.union([
+      z.string().min(1).max(128),
+      z.number(),
+      z.boolean(),
+      z.null(),
+    ]),
+  }),
+  z.object({
+    type: z.literal('trim'),
+  }),
+  z.object({
+    type: z.literal('lower'),
+  }),
+  z.object({
+    type: z.literal('upper'),
+  }),
+  z.object({
+    type: z.literal('substring'),
+    start: z.number().int().min(0),
+    length: z.number().int().positive().optional(),
+  }),
+]);
+
+const MAPPING_SCHEMA = z.object({
+  schema_version: z.literal(1),
+  fields: z
+    .array(
+      z.object({
+        dest: z.string().min(1).max(128),
+        source: MAPPING_SOURCE_SCHEMA,
+        transforms: z.array(MAPPING_TRANSFORM_SCHEMA).max(10).optional(),
+        on_error: z
+          .enum(['skip_field', 'warn_action', 'fail_action'])
+          .optional(),
+        notes: z.string().min(1).max(1024).optional(),
+      }),
+    )
+    .max(250),
+  meta: z
+    .object({
+      name: z.string().min(1).max(64).optional(),
+      notes: z.string().min(1).max(1024).optional(),
+    })
+    .optional(),
+});
+
 export function registerConnectionTools(
   server: McpServer,
   client: MeshesApiClient,
@@ -247,6 +338,71 @@ export function registerConnectionTools(
     async ({ connection_id }) => {
       try {
         return toolOk(await client.getConnectionDefaultMappings(connection_id));
+      } catch (e) {
+        return toolError(e);
+      }
+    },
+  );
+
+  server.registerTool(
+    'meshes_update_connection_default_mappings',
+    {
+      title: 'Update Connection Default Mappings',
+      description:
+        'Store or replace the default field mapping for a connection. Supply a schema with destination fields, payload sources, and optional transforms like trim, lower, default, or type conversion.',
+      inputSchema: {
+        connection_id: z.string().uuid().describe('The connection UUID'),
+        workspace_id: z
+          .string()
+          .uuid()
+          .optional()
+          .describe('Optional workspace UUID for optimistic updates'),
+        mapping_id: z
+          .string()
+          .uuid()
+          .optional()
+          .describe('Optional existing mapping UUID'),
+        expected_version: z
+          .number()
+          .int()
+          .positive()
+          .optional()
+          .describe('Optional optimistic concurrency version'),
+        name: z
+          .string()
+          .min(1)
+          .max(64)
+          .optional()
+          .describe('Optional mapping display name'),
+        schema: MAPPING_SCHEMA.describe(
+          'Mapping schema with field definitions, sources, transforms, and optional metadata',
+        ),
+      },
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async ({
+      connection_id,
+      workspace_id,
+      mapping_id,
+      expected_version,
+      name,
+      schema,
+    }) => {
+      try {
+        return toolOk(
+          await client.updateConnectionDefaultMappings(connection_id, {
+            workspace_id,
+            mapping_id,
+            expected_version,
+            name,
+            schema,
+          }),
+        );
       } catch (e) {
         return toolError(e);
       }

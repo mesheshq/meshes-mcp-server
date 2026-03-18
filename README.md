@@ -11,9 +11,11 @@ create routing rules, and inspect deliveries from any MCP-compatible client.
 
 - **Emit Events** — send product events (signups, payments, cancellations) to Meshes
 - **Manage Workspaces** — list and configure workspaces
+- **Workspace Discovery** — inspect available workspace event types and resources
 - **Routing Rules** — create and update event routing rules
 - **Connections** — manage integration connections (HubSpot, Salesforce, Slack, Mailchimp, etc.)
 - **Delivery Status** — inspect event delivery logs and retry status
+- **Embedded Sessions** — mint, list, refresh, and revoke workspace sessions
 
 ## Setup
 
@@ -116,7 +118,9 @@ Add to your Windsurf MCP configuration:
 | `meshes_get_workspace`                   | Get details of a specific workspace                            |
 | `meshes_create_workspace`                | Create a new workspace                                         |
 | `meshes_update_workspace`                | Update workspace properties                                    |
-| `meshes_list_connections`                | List connections for a workspace                               |
+| `meshes_get_workspace_event_types`       | List event types configured for a workspace                    |
+| `meshes_get_workspace_resources`         | List resources configured for a workspace                      |
+| `meshes_list_connections`                | List connections across the organization                       |
 | `meshes_get_connection`                  | Get details of a connection                                    |
 | `meshes_create_connection`               | Create a new connection destination                            |
 | `meshes_update_connection`               | Update connection configuration metadata                       |
@@ -124,6 +128,7 @@ Add to your Windsurf MCP configuration:
 | `meshes_get_connection_actions`          | Get available actions (destination endpoints) for a connection |
 | `meshes_get_connection_fields`           | Get destination field configuration for mappings               |
 | `meshes_get_connection_default_mappings` | Get default mappings for a connection                          |
+| `meshes_update_connection_default_mappings` | Update default mappings for a connection                    |
 | `meshes_list_rules`                      | List all routing rules                                         |
 | `meshes_get_rule`                        | Get details of a specific routing rule                         |
 | `meshes_create_rule`                     | Create an event routing rule mapping events to an action       |
@@ -134,6 +139,10 @@ Add to your Windsurf MCP configuration:
 | `meshes_get_event_payload`               | Get event details containing data payload                      |
 | `meshes_retry_event_rule`                | Retry a failed rule delivery                                   |
 | `meshes_list_integrations`               | Get metadata about all supported integration types             |
+| `meshes_create_session`                  | Mint a new embedded workspace session                          |
+| `meshes_list_sessions`                   | List embedded sessions for a workspace                         |
+| `meshes_refresh_session`                 | Refresh an existing session token                              |
+| `meshes_revoke_session`                  | Revoke an embedded session                                     |
 
 ## Development
 

@@ -4,6 +4,7 @@ import { registerConnectionTools } from './tools/connections.js';
 import { registerDeliveryTools } from './tools/deliveries.js';
 import { registerEventTools } from './tools/events.js';
 import { registerRuleTools } from './tools/rules.js';
+import { registerSessionTools } from './tools/sessions.js';
 import { registerWorkspaceTools } from './tools/workspaces.js';
 
 export function createServer(client: MeshesApiClient): McpServer {
@@ -17,6 +18,7 @@ export function createServer(client: MeshesApiClient): McpServer {
   registerRuleTools(server, client);
   registerEventTools(server, client);
   registerDeliveryTools(server, client);
+  registerSessionTools(server, client);
 
   return server;
 }
