@@ -21,8 +21,6 @@ describe('emit-event tool', () => {
   beforeEach(() => {
     client = new MeshesApiClient({} as any);
     server = new McpServer({ name: 'test', version: '1.0.0' });
-
-    // In SDK around version >= 1.0.0, we can spy on registerTool
     vi.spyOn(server, 'registerTool');
 
     registerEventTools(server, client as any);
@@ -34,7 +32,7 @@ describe('emit-event tool', () => {
     expect(tools).toContain('meshes_emit_bulk_events');
   });
 
-  it('handlers should call the api client correctly and return ok', async () => {
+  it('single emit handler passes workspace through directly', async () => {
     const emitEventCall = vi
       .mocked(server.registerTool)
       .mock.calls.find((c) => c[0] === 'meshes_emit_event');
@@ -57,9 +55,9 @@ describe('emit-event tool', () => {
       resource: undefined,
       resource_id: undefined,
     });
-
     expect(result.isError).toBeUndefined();
     expect(result.content[0].text).toContain('evt_123');
+    expect(result.content[0].text).toContain('workspace ws');
   });
 
   it('returns error on failure', async () => {
@@ -78,6 +76,23 @@ describe('emit-event tool', () => {
 
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toBe('Auth failed');
+  });
+
+  it('bulk emit handler passes workspace through directly', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_emit_bulk_events');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.emitBulkEvents.mockResolvedValueOnce({ count: 1, records: [] });
+
+    await handler({
+      events: [{ workspace: 'ws', event: 'user.signup', payload: {} }],
+    });
+
+    expect(client.emitBulkEvents).toHaveBeenCalledWith([
+      { workspace: 'ws', event: 'user.signup', payload: {} },
+    ]);
   });
 
   it('bulk handler returns toolError on failure', async () => {

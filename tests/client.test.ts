@@ -66,7 +66,11 @@ describe('MeshesApiClient', () => {
       description: null,
     });
     await client.getWorkspaceConnections('ws_123');
-    await client.getWorkspaceRules('ws_123');
+    await client.getWorkspaceRules('ws_123', {
+      event: 'user.signup',
+      resource: 'user',
+      resource_id: 'u_1',
+    });
     await client.getWorkspaceEvents('ws_123', {
       limit: 25,
       cursor: 'cur_1',
@@ -92,7 +96,7 @@ describe('MeshesApiClient', () => {
       'https://api.test.io/api/v1/workspaces/ws_123/connections',
     );
     expect(calls[4]?.[0]).toBe(
-      'https://api.test.io/api/v1/workspaces/ws_123/rules',
+      'https://api.test.io/api/v1/workspaces/ws_123/rules?event=user.signup&resource=user&resource_id=u_1',
     );
     expect(calls[5]?.[0]).toBe(
       'https://api.test.io/api/v1/workspaces/ws_123/events?limit=25&cursor=cur_1&event=user.signup&status=failed&resource=user&resource_id=u_1',
@@ -221,10 +225,13 @@ describe('MeshesApiClient', () => {
     await client.createSession({
       workspace_id: '123e4567-e89b-12d3-a456-426614174111',
       role: 'admin',
+      session_type: 'resource',
       external_user_id: 'user_123',
       ttl_seconds: 1200,
       launch_ttl_seconds: 30,
-      launch_path: '/workspace/dashboard',
+      launch_page: 'events',
+      resource: 'contact',
+      resource_id: 'contact_123',
       allowed_origins: ['https://app.example.com'],
       scopes: ['events.payload:read'],
     });
@@ -233,6 +240,8 @@ describe('MeshesApiClient', () => {
       limit: 25,
       cursor: 'cur_3',
       status: 'active',
+      resource: 'contact',
+      resource_id: 'contact_123',
     });
     await client.refreshSession('sess_123');
     await client.revokeSession('sess_123');
@@ -244,16 +253,19 @@ describe('MeshesApiClient', () => {
       JSON.stringify({
         workspace_id: '123e4567-e89b-12d3-a456-426614174111',
         role: 'admin',
+        session_type: 'resource',
         external_user_id: 'user_123',
         ttl_seconds: 1200,
         launch_ttl_seconds: 30,
-        launch_path: '/workspace/dashboard',
+        launch_page: 'events',
+        resource: 'contact',
+        resource_id: 'contact_123',
         allowed_origins: ['https://app.example.com'],
         scopes: ['events.payload:read'],
       }),
     );
     expect(calls[1]?.[0]).toBe(
-      'https://api.test.io/api/v1/sessions?workspace_id=123e4567-e89b-12d3-a456-426614174111&limit=25&cursor=cur_3&status=active',
+      'https://api.test.io/api/v1/sessions?workspace_id=123e4567-e89b-12d3-a456-426614174111&limit=25&cursor=cur_3&status=active&resource=contact&resource_id=contact_123',
     );
     expect(calls[2]?.[0]).toBe(
       'https://api.test.io/api/v1/sessions/sess_123/refresh',
@@ -341,5 +353,26 @@ describe('MeshesApiClient', () => {
     const call = vi.mocked(fetch).mock.calls[0];
     expect(call[1]?.method).toBe('DELETE');
     expect(call[1]?.body).toBeNull();
+  });
+
+  it('should allow emitting an event without a workspace field', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      jsonResponse({ event: { id: 'evt_123' } }),
+    );
+
+    await client.emitEvent({
+      event: 'user.signup',
+      payload: { email: 'a@example.com' },
+    });
+
+    const call = vi.mocked(fetch).mock.calls[0];
+    expect(call[0]).toBe('https://api.test.io/api/v1/events');
+    expect(call[1]?.method).toBe('POST');
+    expect(call[1]?.body).toBe(
+      JSON.stringify({
+        event: 'user.signup',
+        payload: { email: 'a@example.com' },
+      }),
+    );
   });
 });

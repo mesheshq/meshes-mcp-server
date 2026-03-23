@@ -9,7 +9,7 @@ export function registerEventTools(server: McpServer, client: MeshesApiClient) {
     {
       title: 'Emit Event',
       description:
-        "Emit a product event to Meshes for routing and delivery. The event is matched against rules in the specified workspace and delivered to all matching connections. Always include 'email' in the payload for person-related events.",
+        "Emit a product event to Meshes for routing and delivery. Because this MCP server uses organization-level machine credentials, workspace is required for each emitted event. Always include 'email' in the payload for person-related events.",
       inputSchema: {
         workspace: z
           .string()
@@ -73,7 +73,7 @@ export function registerEventTools(server: McpServer, client: MeshesApiClient) {
     {
       title: 'Emit Bulk Events',
       description:
-        'Emit up to 100 events in a single request. Returns 201 on full success, 207 on partial success with per-event error details.',
+        'Emit up to 100 events in a single request. Because this MCP server uses organization-level machine credentials, each event must include workspace. Returns 201 on full success, 207 on partial success with per-event error details.',
       inputSchema: {
         events: z
           .array(
