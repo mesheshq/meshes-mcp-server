@@ -202,9 +202,19 @@ export function registerWorkspaceTools(
     'meshes_get_workspace_rules',
     {
       title: 'Get Workspace Rules',
-      description: 'List all routing rules scoped to a specific workspace.',
+      description:
+        'List routing rules scoped to a specific workspace, with optional event and resource filters.',
       inputSchema: {
         workspace_id: z.string().uuid().describe('The workspace UUID'),
+        event: z
+          .string()
+          .optional()
+          .describe("Optional event filter (e.g., 'user.signup')"),
+        resource: z.string().optional().describe('Optional resource filter'),
+        resource_id: z
+          .string()
+          .optional()
+          .describe('Optional resource ID filter'),
       },
       annotations: {
         readOnlyHint: true,
@@ -213,9 +223,15 @@ export function registerWorkspaceTools(
         openWorldHint: true,
       },
     },
-    async ({ workspace_id }) => {
+    async ({ workspace_id, event, resource, resource_id }) => {
       try {
-        return toolOk(await client.getWorkspaceRules(workspace_id));
+        return toolOk(
+          await client.getWorkspaceRules(workspace_id, {
+            event,
+            resource,
+            resource_id,
+          }),
+        );
       } catch (e) {
         return toolError(e);
       }

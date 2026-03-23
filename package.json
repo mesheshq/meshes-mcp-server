@@ -1,6 +1,6 @@
 {
   "name": "@mesheshq/mcp-server",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "MCP server for Meshes — emit events, manage workspaces, create rules, and inspect deliveries from any MCP-compatible client.",
   "type": "module",
   "main": "dist/index.js",

@@ -15,7 +15,7 @@ create routing rules, and inspect deliveries from any MCP-compatible client.
 - **Routing Rules** — create and update event routing rules
 - **Connections** — manage integration connections (HubSpot, Salesforce, Slack, Mailchimp, etc.)
 - **Delivery Status** — inspect event delivery logs and retry status
-- **Embedded Sessions** — mint, list, refresh, and revoke workspace sessions
+- **Embedded Sessions** — mint, list, refresh, and revoke workspace, dashboard, or resource-scoped sessions
 
 ## Setup
 
@@ -118,8 +118,10 @@ Add to your Windsurf MCP configuration:
 | `meshes_get_workspace`                   | Get details of a specific workspace                            |
 | `meshes_create_workspace`                | Create a new workspace                                         |
 | `meshes_update_workspace`                | Update workspace properties                                    |
+| `meshes_get_workspace_connections`       | List connections scoped to a workspace                         |
 | `meshes_get_workspace_event_types`       | List event types configured for a workspace                    |
 | `meshes_get_workspace_resources`         | List resources configured for a workspace                      |
+| `meshes_get_workspace_rules`             | List workspace rules with optional event/resource filters      |
 | `meshes_list_connections`                | List connections across the organization                       |
 | `meshes_get_connection`                  | Get details of a connection                                    |
 | `meshes_create_connection`               | Create a new connection destination                            |
@@ -139,8 +141,8 @@ Add to your Windsurf MCP configuration:
 | `meshes_get_event_payload`               | Get event details containing data payload                      |
 | `meshes_retry_event_rule`                | Retry a failed rule delivery                                   |
 | `meshes_list_integrations`               | Get metadata about all supported integration types             |
-| `meshes_create_session`                  | Mint a new embedded workspace session                          |
-| `meshes_list_sessions`                   | List embedded sessions for a workspace                         |
+| `meshes_create_session`                  | Mint a workspace, dashboard, or resource-scoped embed session  |
+| `meshes_list_sessions`                   | List embedded sessions for a workspace with optional filters   |
 | `meshes_refresh_session`                 | Refresh an existing session token                              |
 | `meshes_revoke_session`                  | Revoke an embedded session                                     |
 

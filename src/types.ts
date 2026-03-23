@@ -31,9 +31,22 @@ export const SESSION_STATUSES = ['active', 'revoked'] as const;
 
 export type SessionStatus = (typeof SESSION_STATUSES)[number];
 
+export const SESSION_TYPES = ['workspace', 'resource', 'dashboard'] as const;
+
+export type SessionType = (typeof SESSION_TYPES)[number];
+
 export const SESSION_SCOPES = ['events.payload:read'] as const;
 
 export type SessionScope = (typeof SESSION_SCOPES)[number];
+
+export const SESSION_LAUNCH_PAGES = [
+  'dashboard',
+  'connections',
+  'rules',
+  'events',
+] as const;
+
+export type SessionLaunchPage = (typeof SESSION_LAUNCH_PAGES)[number];
 
 export interface PaginatedResponse<T> {
   count: number;
@@ -257,6 +270,9 @@ export interface Session {
   expires_at: string;
   workspace_id: string;
   role: SessionRole;
+  session_type: SessionType;
+  resource?: string;
+  resource_id?: string;
 }
 
 export interface CreatedSession extends Session {
@@ -268,12 +284,15 @@ export interface CreatedSession extends Session {
 export interface SessionRecord {
   session_id: string;
   workspace_id: string;
-  role: string;
+  role: SessionRole;
   external_user_id?: string;
-  status: string;
+  status: SessionStatus;
   created_at: string;
   expires_at: string;
   is_expired: boolean;
+  session_type: SessionType;
+  resource?: string;
+  resource_id?: string;
 }
 
 export interface MeshesConfig {

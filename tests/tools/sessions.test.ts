@@ -47,10 +47,13 @@ describe('session tools', () => {
     await handler({
       workspace_id: 'ws_123',
       role: 'admin',
+      session_type: 'resource',
       external_user_id: 'user_123',
       ttl_seconds: 1200,
       launch_ttl_seconds: 30,
-      launch_path: '/workspace/dashboard',
+      launch_page: 'events',
+      resource: 'contact',
+      resource_id: 'contact_123',
       allowed_origins: ['https://app.example.com'],
       scopes: ['events.payload:read'],
     });
@@ -58,10 +61,13 @@ describe('session tools', () => {
     expect(client.createSession).toHaveBeenCalledWith({
       workspace_id: 'ws_123',
       role: 'admin',
+      session_type: 'resource',
       external_user_id: 'user_123',
       ttl_seconds: 1200,
       launch_ttl_seconds: 30,
-      launch_path: '/workspace/dashboard',
+      launch_page: 'events',
+      resource: 'contact',
+      resource_id: 'contact_123',
       allowed_origins: ['https://app.example.com'],
       scopes: ['events.payload:read'],
     });
@@ -80,6 +86,8 @@ describe('session tools', () => {
       limit: 25,
       cursor: 'cur_1',
       status: 'active',
+      resource: 'contact',
+      resource_id: 'contact_123',
     });
 
     expect(client.listSessions).toHaveBeenCalledWith({
@@ -87,6 +95,8 @@ describe('session tools', () => {
       limit: 25,
       cursor: 'cur_1',
       status: 'active',
+      resource: 'contact',
+      resource_id: 'contact_123',
     });
     expect(result.isError).toBeUndefined();
   });

@@ -107,6 +107,28 @@ describe('workspace tools', () => {
     expect(result.content[0].text).toBe('Rules error');
   });
 
+  it('workspace rules handler passes optional filters', async () => {
+    const call = vi
+      .mocked(server.registerTool)
+      .mock.calls.find((c) => c[0] === 'meshes_get_workspace_rules');
+    const handler = call?.[2] as (args: any) => Promise<any>;
+
+    client.getWorkspaceRules.mockResolvedValueOnce({ records: [] });
+
+    await handler({
+      workspace_id: 'ws_123',
+      event: 'user.signup',
+      resource: 'user',
+      resource_id: 'user_123',
+    });
+
+    expect(client.getWorkspaceRules).toHaveBeenCalledWith('ws_123', {
+      event: 'user.signup',
+      resource: 'user',
+      resource_id: 'user_123',
+    });
+  });
+
   it('workspace event types handler returns ok', async () => {
     const call = vi
       .mocked(server.registerTool)

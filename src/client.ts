@@ -16,10 +16,12 @@ import type {
   RuleEvent,
   RuleMetadata,
   Session,
+  SessionLaunchPage,
   SessionRecord,
   SessionRole,
   SessionScope,
   SessionStatus,
+  SessionType,
   Workspace,
   WorkspaceCatalogEntry,
 } from './types.js';
@@ -154,8 +156,21 @@ export class MeshesApiClient {
     return this.request(`/workspaces/${id}/connections`);
   }
 
-  getWorkspaceRules(id: string): Promise<PaginatedResponse<Rule>> {
-    return this.request(`/workspaces/${id}/rules`);
+  getWorkspaceRules(
+    id: string,
+    params?: {
+      event?: string;
+      resource?: string;
+      resource_id?: string;
+    },
+  ): Promise<PaginatedResponse<Rule>> {
+    return this.request(
+      `/workspaces/${id}/rules${buildQueryString({
+        event: params?.event,
+        resource: params?.resource,
+        resource_id: params?.resource_id,
+      })}`,
+    );
   }
 
   getWorkspaceEventTypes(id: string): Promise<WorkspaceCatalogEntry[]> {
@@ -385,10 +400,13 @@ export class MeshesApiClient {
   createSession(params: {
     workspace_id: string;
     role?: SessionRole;
+    session_type?: SessionType;
     external_user_id?: string;
     ttl_seconds?: number;
     launch_ttl_seconds?: number;
-    launch_path?: string;
+    launch_page?: SessionLaunchPage;
+    resource?: string;
+    resource_id?: string;
     allowed_origins?: string[];
     scopes?: SessionScope[];
   }): Promise<CreatedSession> {
@@ -403,6 +421,8 @@ export class MeshesApiClient {
     limit?: number;
     cursor?: string;
     status?: SessionStatus;
+    resource?: string;
+    resource_id?: string;
   }): Promise<PaginatedResponse<SessionRecord>> {
     return this.request(
       `/sessions${buildQueryString({
@@ -410,6 +430,8 @@ export class MeshesApiClient {
         limit: params.limit,
         cursor: params.cursor,
         status: params.status,
+        resource: params.resource,
+        resource_id: params.resource_id,
       })}`,
     );
   }
