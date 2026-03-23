@@ -87,9 +87,7 @@ describe('emit-event tool', () => {
     client.emitBulkEvents.mockResolvedValueOnce({ count: 1, records: [] });
 
     await handler({
-      events: [
-        { workspace: 'ws', event: 'user.signup', payload: {} },
-      ],
+      events: [{ workspace: 'ws', event: 'user.signup', payload: {} }],
     });
 
     expect(client.emitBulkEvents).toHaveBeenCalledWith([
