@@ -1,11 +1,13 @@
 export const INTEGRATION_TYPES = [
   'activecampaign',
   'aweber',
+  'discord',
   'hubspot',
   'intercom',
   'mailchimp',
   'mailerlite',
   'resend',
+  'sendgrid',
   'salesforce',
   'slack',
   'webhook',
@@ -13,6 +15,253 @@ export const INTEGRATION_TYPES = [
 ] as const;
 
 export type IntegrationType = (typeof INTEGRATION_TYPES)[number];
+
+export const CONNECTION_INACTIVE_REASONS = [
+  'authentication_invalid',
+  'oauth_authorization_revoked',
+  'oauth_reauthorization_required',
+  'manually_inactivated',
+] as const;
+
+export type ConnectionInactiveReason =
+  (typeof CONNECTION_INACTIVE_REASONS)[number];
+
+export const CONNECTION_FIELD_TYPES = [
+  'string',
+  'number',
+  'boolean',
+  'date',
+  'datetime',
+  'enum',
+  'multi_enum',
+  'json',
+  'object',
+  'array',
+  'unknown',
+] as const;
+
+export type ConnectionFieldType = (typeof CONNECTION_FIELD_TYPES)[number];
+
+export const CONNECTION_FIELD_FORMATS = [
+  'email',
+  'phone',
+  'url',
+  'uuid',
+  'date',
+  'datetime',
+  'unknown',
+] as const;
+
+export type ConnectionFieldFormat = (typeof CONNECTION_FIELD_FORMATS)[number];
+
+export const INTEGRATION_AUTHENTICATION_TYPES = [
+  'api_key',
+  'basic',
+  'none',
+  'oauth',
+] as const;
+
+export type IntegrationAuthenticationType =
+  (typeof INTEGRATION_AUTHENTICATION_TYPES)[number];
+
+export const INTEGRATION_AUTHENTICATION_FIELD_TYPES = [
+  'text',
+  'password',
+  'select',
+] as const;
+
+export type IntegrationAuthenticationFieldType =
+  (typeof INTEGRATION_AUTHENTICATION_FIELD_TYPES)[number];
+
+export const INTEGRATION_ACTION_FIELD_TYPES = [
+  'text',
+  'password',
+  'textarea',
+  'select',
+] as const;
+
+export type IntegrationActionFieldType =
+  (typeof INTEGRATION_ACTION_FIELD_TYPES)[number];
+
+export interface IntegrationOption {
+  label: string;
+  value: string;
+}
+
+export interface IntegrationFieldDependency {
+  field: string;
+  value: string | string[];
+}
+
+export interface IntegrationAuthenticationField {
+  label: string;
+  key: string;
+  type: IntegrationAuthenticationFieldType;
+  helpText?: string;
+  required?: boolean;
+  validate?: 'url';
+  defaultValue?: string;
+  options?: IntegrationOption[];
+  dependsOn?: IntegrationFieldDependency;
+}
+
+export interface IntegrationAuthenticationBase {
+  fields?: IntegrationAuthenticationField[];
+}
+
+export interface ApiKeyIntegrationAuthentication
+  extends IntegrationAuthenticationBase {
+  type: 'api_key';
+}
+
+export interface BasicIntegrationAuthentication
+  extends IntegrationAuthenticationBase {
+  type: 'basic';
+}
+
+export interface NoAuthIntegrationAuthentication
+  extends IntegrationAuthenticationBase {
+  type: 'none';
+}
+
+export interface OAuthIntegrationAuthentication
+  extends IntegrationAuthenticationBase {
+  type: 'oauth';
+  oauth: {
+    version: 1 | 2;
+  };
+}
+
+export type IntegrationAuthentication =
+  | ApiKeyIntegrationAuthentication
+  | BasicIntegrationAuthentication
+  | NoAuthIntegrationAuthentication
+  | OAuthIntegrationAuthentication;
+
+export interface IntegrationActionDisplay {
+  label: string;
+  description: string;
+}
+
+export interface IntegrationActionSimpleInput {
+  key: string;
+  field: string;
+  kind: 'simple';
+  label?: string;
+  noun?: string;
+  target?: string;
+  from?: string;
+  required?: boolean;
+}
+
+export interface IntegrationActionFieldInput {
+  key: string;
+  field: string;
+  kind: 'field';
+  label: string;
+  type: IntegrationActionFieldType;
+  noun?: string;
+  description?: string;
+  placeholder?: string;
+  regex?: string;
+  regexMessage?: string;
+  required?: boolean;
+  options?: IntegrationOption[];
+  defaultValue?: string;
+}
+
+export interface IntegrationActionAdvancedOptionDisplay {
+  label: string;
+  button: string;
+  description: string;
+}
+
+export interface IntegrationActionAdvancedArrayOption {
+  key: string;
+  field: string;
+  length: number;
+  display: IntegrationActionAdvancedOptionDisplay;
+  type: 'array';
+  entity: 'string';
+}
+
+export interface IntegrationActionAdvancedSelectOption {
+  key: string;
+  field: string;
+  length: number;
+  display: IntegrationActionAdvancedOptionDisplay;
+  type: 'select';
+  entity: 'option';
+}
+
+export interface IntegrationActionAdvancedInput {
+  key: string;
+  field: string;
+  kind: 'advanced';
+  options:
+    | IntegrationActionAdvancedArrayOption
+    | IntegrationActionAdvancedSelectOption;
+  label?: string;
+  noun?: string;
+  target?: string;
+  from?: string;
+  required?: boolean;
+}
+
+export type IntegrationActionInput =
+  | IntegrationActionSimpleInput
+  | IntegrationActionFieldInput
+  | IntegrationActionAdvancedInput;
+
+export interface IntegrationAction {
+  key: string;
+  label: string;
+  noun: string;
+  data?: IntegrationActionInput[];
+  fields?: string[];
+  display?: IntegrationActionDisplay;
+}
+
+export interface Integration {
+  name: string;
+  type: IntegrationType;
+  authentication: IntegrationAuthentication;
+  actions: Record<string, IntegrationAction>;
+}
+
+export interface ConnectionFieldConstraints {
+  format?: ConnectionFieldFormat;
+  required?: boolean;
+  read_only?: boolean;
+  max_length?: number;
+  min_length?: number;
+  pattern?: string;
+  min?: number;
+  max?: number;
+  allowed_values?: string[];
+}
+
+export interface ConnectionFieldDefinition {
+  key: string;
+  label?: string;
+  type: ConnectionFieldType;
+  description?: string;
+  constraints?: ConnectionFieldConstraints;
+  provider_meta?: Record<string, unknown>;
+}
+
+export interface ConnectionFieldCatalog {
+  id: string;
+  workspace_id: string;
+  connection_id: string;
+  integration_type: IntegrationType;
+  catalog_version: string;
+  refreshed_at: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  fields: ConnectionFieldDefinition[];
+}
 
 export const EVENT_STATUSES = [
   'pending',
@@ -82,7 +331,9 @@ export interface Connection {
   name: string;
   metadata: Record<string, unknown>;
   action_data?: Record<string, unknown>;
-  hidden: boolean;
+  active?: boolean;
+  inactive_reason?: ConnectionInactiveReason;
+  hidden?: boolean;
   created_by: string;
   created_at: string;
   updated_at: string;

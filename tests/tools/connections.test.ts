@@ -71,13 +71,14 @@ describe('connection tools', () => {
     });
   });
 
-  it('create handler schema allows slack integration type', () => {
+  it('create handler schema allows newly added integration types', () => {
     const call = vi
       .mocked(server.registerTool)
       .mock.calls.find((c) => c[0] === 'meshes_create_connection');
     const typeSchema = (call?.[1] as any).inputSchema.type;
 
-    expect(typeSchema.parse('slack')).toBe('slack');
+    expect(typeSchema.parse('discord')).toBe('discord');
+    expect(typeSchema.parse('sendgrid')).toBe('sendgrid');
   });
 
   it('delete handler manages force deletion flag', async () => {

@@ -5,8 +5,10 @@ import {
 import type {
   Connection,
   ConnectionDefaultMappingResult,
+  ConnectionFieldCatalog,
   CreatedSession,
   EventStatus,
+  Integration,
   IntegrationType,
   MappingSchema,
   MeshesConfig,
@@ -255,12 +257,17 @@ export class MeshesApiClient {
     return this.request(`/connections/${id}/actions`);
   }
 
-  getConnectionFields(id: string, refresh?: boolean): Promise<unknown> {
+  getConnectionFields(
+    id: string,
+    refresh?: boolean,
+  ): Promise<ConnectionFieldCatalog> {
     const qs = refresh ? '?refresh=true' : '';
     return this.request(`/connections/${id}/fields${qs}`);
   }
 
-  getConnectionDefaultMappings(id: string): Promise<unknown> {
+  getConnectionDefaultMappings(
+    id: string,
+  ): Promise<ConnectionDefaultMappingResult> {
     return this.request(`/connections/${id}/mappings/default`);
   }
 
@@ -391,7 +398,7 @@ export class MeshesApiClient {
 
   // ── Integrations ──────────────────────────────────────────
 
-  listIntegrations(): Promise<PaginatedResponse<unknown>> {
+  listIntegrations(): Promise<PaginatedResponse<Integration>> {
     return this.request('/integrations');
   }
 
