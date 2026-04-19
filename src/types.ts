@@ -1,6 +1,7 @@
 export const INTEGRATION_TYPES = [
   'activecampaign',
   'aweber',
+  'customer_io',
   'discord',
   'hubspot',
   'intercom',
