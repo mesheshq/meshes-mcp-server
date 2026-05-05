@@ -78,6 +78,7 @@ describe('connection tools', () => {
     const typeSchema = (call?.[1] as any).inputSchema.type;
 
     expect(typeSchema.parse('discord')).toBe('discord');
+    expect(typeSchema.parse('pipedrive')).toBe('pipedrive');
     expect(typeSchema.parse('sendgrid')).toBe('sendgrid');
   });
 
