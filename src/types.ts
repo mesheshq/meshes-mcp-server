@@ -7,6 +7,7 @@ export const INTEGRATION_TYPES = [
   'intercom',
   'mailchimp',
   'mailerlite',
+  'pipedrive',
   'resend',
   'sendgrid',
   'salesforce',
